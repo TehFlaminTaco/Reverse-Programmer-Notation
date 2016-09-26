@@ -24,7 +24,7 @@ Flow of Control in RProgN is handled through specific functions which push the r
 
 ## &#39;if&#39; statements
 
-The If statement simply pops the top of the stack, checks if it&#39;s a truthy value, and will either continue reading the script, or shunt to the matching else/end otherwise.
+The If statement simply peeks the top of the stack, checks if it&#39;s a truthy value, and will either continue reading the script, or shunt to the matching else/end otherwise.
 
 ## &#39;while&#39; statements
 
