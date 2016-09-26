@@ -75,7 +75,7 @@ As per default, RProgN should contain the following functions where a,b,c... are
 - &#39;time&#39;: pushes the current os time in Unix Time
 - &#39;len&#39;: pushes the size of a, the such that if a is a string, then the length of that string, or if a is a stack, the size of that stack
 - &#39;floor&#39;: pushes the floor of a
-- &#39;sub&#39;: pushes the substring of c between b and a
+- &#39;sub&#39;: pushes the substring of c between a and b
 - &#39;do&#39;: Interpret a as RProgN
 - &#39;stack&#39;: pushes a new stack (Which also doubles as an associative array)
 - &#39;push&#39;: push a to b
@@ -88,6 +88,8 @@ As per default, RProgN should contain the following functions where a,b,c... are
 - &#39;truthy&#39;: push true if the value is truthy, false otherwise.
 - &#39;debug&#39;: Output debug information.
 - &#39;local&#39;: push the &#39;local&#39; array to the stack. Useful with asoc, as local is also accessible from the current namespace.
+- &#39;tostack&#39;: push a stack containing each individual substring of a to the stack.
+- &#39;inverse&#39;: push an upside down version of a
 
 ## Defining Functions
 
