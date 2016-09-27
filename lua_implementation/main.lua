@@ -83,6 +83,7 @@ def_funcs['flow'] = function() reg.push(flow) end
 def_funcs['local'] = function(i,inp,f,l) reg.push(l) end
 def_funcs['read'] = function() reg.push(io.read()) end
 def_funcs['find'] = function() local a,b = reg.pop(),reg.pop() reg.push(b:find(a)) end
+def_funcs['rep'] = function() local a,b = reg.pop(),reg.pop() reg.push(b:rep(a)) end
 def_funcs['replace'] = function() local a,b,c = reg.pop(),reg.pop(),reg.pop() reg.push(c:gsub(b,a)) end
 def_funcs['frombase'] = function()
 	local a,b = reg.pop(),reg.pop()
@@ -100,7 +101,7 @@ def_funcs['frombase'] = function()
 			n = n * a + s
 		end
 	end
-	reg.push(n)
+	reg.push(math.floor(n))
 end
 def_funcs['base'] = function()
 	local a = reg.pop()
