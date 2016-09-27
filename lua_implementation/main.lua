@@ -84,6 +84,24 @@ def_funcs['local'] = function(i,inp,f,l) reg.push(l) end
 def_funcs['read'] = function() reg.push(io.read()) end
 def_funcs['find'] = function() local a,b = reg.pop(),reg.pop() reg.push(b:find(a)) end
 def_funcs['replace'] = function() local a,b,c = reg.pop(),reg.pop(),reg.pop() reg.push(c:gsub(b,a)) end
+def_funcs['frombase'] = function()
+	local a,b = reg.pop(),reg.pop()
+	local n = 0
+	if(type(b)=='string')then
+		while #b > 0 do
+			local s = b:sub(1,1)
+			b = b:sub(2,#b)
+			s = s:byte()
+			if s >= 48 and s <= 57 then
+				s = string.char(s)
+			else
+				s = s - 55
+			end
+			n = n * a + s
+		end
+	end
+	reg.push(n)
+end
 def_funcs['base'] = function()
 	local a = reg.pop()
 	local b = reg.pop()

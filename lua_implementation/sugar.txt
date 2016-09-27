@@ -1,4 +1,5 @@
 B base
+-B frombase
 r reg
 = asoc
 s stack
