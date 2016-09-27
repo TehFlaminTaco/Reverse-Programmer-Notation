@@ -1,0 +1,14 @@
+B base
+r reg
+= asoc
+s stack
+S tostack
+i invert
+++ sum
+_ floor
+L len
+b byte
+c char
+| split
+!! truthy
+=> function

@@ -83,6 +83,23 @@ def_funcs['flow'] = function() reg.push(flow) end
 def_funcs['local'] = function(i,inp,f,l) reg.push(l) end
 def_funcs['read'] = function() reg.push(io.read()) end
 def_funcs['find'] = function() local a,b = reg.pop(),reg.pop() reg.push(b:find(a)) end
+def_funcs['replace'] = function() local a,b,c = reg.pop(),reg.pop(),reg.pop() reg.push(c:gsub(b,a)) end
+def_funcs['base'] = function()
+	local a = reg.pop()
+	local b = reg.pop()
+	if(type(b)=='number')then
+		local s = ''
+		while b > 0 do
+			local n = (b % a)
+			if n >= 10 then
+				n = string.char(55 + n)
+			end
+			s = n .. s
+			b = math.floor(b / a)
+		end
+		reg.push(s)
+	end
+end
 def_funcs['sum'] = function(_,_,f)
 	local a = reg.pop()
 	if(type(a)=='table')then
@@ -300,6 +317,7 @@ def_funcs['debug'] = function(i,inp)
 	end
 	print(str)
 end
+
 flow = stack.new()
 flow.push(def_funcs['if'])
 flow.push(def_funcs['if_peek'])
@@ -307,6 +325,16 @@ flow.push(def_funcs['for'])
 flow.push(def_funcs['while'])
 flow.push(def_funcs['while_peek'])
 flow.push(def_funcs['function'])
+
+local sugar = io.open('sugar.txt')
+sugar = sugar:read('*a')
+for str in sugar:gmatch"[^\r\n]*" do
+	local a,b = str:match("(%S+)%s+(%S+)")
+	if a and b and def_funcs[b] then
+		def_funcs[a] = def_funcs[b]
+	end
+end
+
 function rpn(input, doEchoStack, upperLocal)
 	local locals = setmetatable({},{__index = upperLocal})
 	local funcs = setmetatable({}, {__index = function(t, key)
