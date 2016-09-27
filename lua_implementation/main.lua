@@ -51,7 +51,6 @@ def_funcs[']'] = function() reg.push(reg.peek()) end
 def_funcs['['] = function() reg.pop() end
 def_funcs['\\'] = function() local a,b = reg.pop(), reg.pop() reg.push(a) reg.push(b) end
 def_funcs['=='] = function() local a,b = reg.pop(),reg.pop() reg.push(b == a) end
-def_funcs['='] = function() local a,b = reg.pop(),reg.pop() reg.push(b == a) end
 def_funcs['!='] = function() local a,b = reg.pop(),reg.pop() reg.push(b ~= a) end
 def_funcs['>='] = function() local a,b = reg.pop(),reg.pop() reg.push(b >= a) end
 def_funcs['<='] = function() local a,b = reg.pop(),reg.pop() reg.push(b <= a) end
@@ -67,7 +66,7 @@ def_funcs['%'] = function() local a,b = reg.pop(),reg.pop() reg.push(b % a) end
 def_funcs['max'] = function() reg.push(math.max(reg.pop(),reg.pop())) end
 def_funcs['min'] = function() reg.push(math.min(reg.pop(),reg.pop())) end
 def_funcs['p'] = function() print(reg.pop()) end
-def_funcs['rand'] = function() local b,a = reg.pop(),reg.pop() reg.push(math.random()*(b-a)+a)end
+def_funcs['rand'] = function()local b = reg.pop()if(type(b)=='table')then local i = math.random(b.len())local s = b.clone()local o = nil for z=1, i do o = s.pop()end reg.push(o)else local a = reg.pop() reg.push(math.random()*(b-a)+a) end end
 def_funcs['randomseed'] = function() math.randomseed(reg.pop()) end
 def_funcs['time'] = function() reg.push(os.time()) end
 def_funcs['len'] = function() local a = reg.pop() if (type(a)=='string') then reg.push(#a) else reg.push(a.len()) end end
@@ -84,6 +83,24 @@ def_funcs['flow'] = function() reg.push(flow) end
 def_funcs['local'] = function(i,inp,f,l) reg.push(l) end
 def_funcs['read'] = function() reg.push(io.read()) end
 def_funcs['find'] = function() local a,b = reg.pop(),reg.pop() reg.push(b:find(a)) end
+def_funcs['sum'] = function(_,_,f)
+	local a = reg.pop()
+	if(type(a)=='table')then
+		local val = a.pop()
+		local val2 = a.pop()
+		while val2 do
+			reg.push(val)
+			reg.push(val2)
+			f['+']()
+			val = reg.pop()
+			val2 = a.pop()
+		end
+		reg.push(val)
+	else
+		reg.push(a)
+		f['+']()
+	end
+end
 def_funcs['type'] = function()
 	local v = reg.pop()
 	local t = type(v)
@@ -184,6 +201,16 @@ function flow_to(i,inp,funcs)
 	end
 end
 def_funcs['if'] = function(i,inp,funcs)
+	funcs['truthy'](i,inp) local case = reg.pop()
+	loops.push('if')
+	local t = {i = i}
+	if not case then
+		local s = stack.new()
+		return {i = flow_to(i,inp,funcs).i - 4}
+	end
+	return t
+end
+def_funcs['if_peek'] = function(i,inp,funcs)
 	reg.push(reg.peek())
 	funcs['truthy'](i,inp) local case = reg.pop()
 	loops.push('if')
@@ -242,6 +269,15 @@ def_funcs['end'] = function(i,inp)
 	end
 end
 def_funcs['while'] = function(i, inp, funcs)
+	funcs['truthy'](i,inp) local case = reg.pop()
+	if case then
+		loops.push(i - (#'while'+1))
+	else
+		local t = flow_to(i,inp,funcs)
+		return t
+	end
+end
+def_funcs['while_peek'] = function(i, inp, funcs)
 	reg.push(reg.peek())
 	funcs['truthy'](i,inp) local case = reg.pop()
 	if case then
@@ -266,8 +302,10 @@ def_funcs['debug'] = function(i,inp)
 end
 flow = stack.new()
 flow.push(def_funcs['if'])
+flow.push(def_funcs['if_peek'])
 flow.push(def_funcs['for'])
 flow.push(def_funcs['while'])
+flow.push(def_funcs['while_peek'])
 flow.push(def_funcs['function'])
 function rpn(input, doEchoStack, upperLocal)
 	local locals = setmetatable({},{__index = upperLocal})
