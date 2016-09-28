@@ -11,5 +11,6 @@ L len
 b byte
 c char
 | split
+! not	
 !! truthy
 => function

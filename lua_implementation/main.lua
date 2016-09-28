@@ -74,10 +74,13 @@ def_funcs['floor'] = function() reg.push(math.floor(reg.pop())) end
 def_funcs['sub'] = function() local a,b,c = reg.pop(),reg.pop(),reg.pop() reg.push(c:sub(b,a)) end
 def_funcs['do'] = function(_,_,l) rpn(reg.pop(),false,l) end
 def_funcs['stack'] = function() reg.push(stack.new()) end
+def_funcs['not'] = function(_,_,f) f['truthy']() reg.push(not reg.pop()) end
 def_funcs['reg'] = function() reg.push(reg) end
 def_funcs['push'] = function() local a,b = reg.pop(),reg.pop() b.push(a) end
 def_funcs['pop'] = function() reg.push(reg.pop().pop()) end
 def_funcs['peek'] = function() reg.push(reg.pop().peek()) end
+def_funcs['hasvalue'] = function() local a,b = reg.pop(),reg.pop() reg.push(b.hasValue(a)) end
+def_funcs['exit'] = function() return {i = math.huge} end
 def_funcs['mem'] = function() reg.push(mem) end
 def_funcs['flow'] = function() reg.push(flow) end
 def_funcs['local'] = function(i,inp,f,l) reg.push(l) end
