@@ -84,7 +84,19 @@ def_funcs['local'] = function(i,inp,f,l) reg.push(l) end
 def_funcs['read'] = function() reg.push(io.read()) end
 def_funcs['find'] = function() local a,b = reg.pop(),reg.pop() reg.push(b:find(a)) end
 def_funcs['rep'] = function() local a,b = reg.pop(),reg.pop() reg.push(b:rep(a)) end
-def_funcs['replace'] = function() local a,b,c = reg.pop(),reg.pop(),reg.pop() reg.push(c:gsub(b,a)) end
+def_funcs['replace'] = function() local a,b,c = reg.pop(),reg.pop(),reg.pop()
+	if(type(a)=='string')then
+		reg.push(c:gsub(b,a))
+	else
+		reg.push(c:gsub(b,function(...) for k,v in pairs({...}) do reg.push(v) end a() return reg.pop() end))
+	end
+end
+def_funcs['map'] = function(_,_,fu)
+	local f = reg.pop()
+	reg.push('.')
+	reg.push(f)
+	fu['replace']()
+end
 def_funcs['frombase'] = function()
 	local a,b = reg.pop(),reg.pop()
 	local n = 0
