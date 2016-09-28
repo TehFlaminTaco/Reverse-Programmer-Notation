@@ -105,6 +105,49 @@ def_funcs['map'] = function(_,_,fu)
 	reg.push(f)
 	fu['replace']()
 end
+b64 = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=' -- The ='s is a padder cell. We put this in here so we can replace nulll bytes.
+def_funcs['encode64'] = function()
+	local s = ''
+	local a = reg.pop()
+	for A,B,C in a:gmatch"(.)(.?)(.?)" do -- Search for ALL tripplets.
+		local a,b,c = A:byte(), (B and B:byte() or 0), (C and C:byte() or 0)
+		local n = math.floor(a * (2^16) + b * (2^8) + c)
+		local d = n % 64
+		c = math.floor(n / 64) % 64
+		b = math.floor(math.floor(n/64)/64) % 64
+		a = math.floor(math.floor(math.floor(n/64)/64)/64) % 64
+		if B:len()<=0 then
+			c = 64
+		end
+		if C:len()<=0 then
+			d = 64
+		end
+		a,b,c,d = b64:sub(a+1,a+1),b64:sub(b+1,b+1),b64:sub(c+1,c+1),b64:sub(d+1,d+1)
+		s = s .. a .. b .. c .. d
+	end
+	reg.push(s)
+end
+def_funcs['decode64'] = function()
+	local s = ''
+	local a = reg.pop()
+	local _,c = a:gsub(b64:sub(65,65), '')
+	local len = (a:len()/4)*3 - c
+	local co = 0
+	print(len)
+	for A,B,C,D in a:gmatch"(.)(.?)(.?)(.?)" do
+		local a,b,c,d = b64:find(A)-1,b64:find(B)-1,b64:find(C)-1,b64:find(D)-1
+		local n = math.floor(a * (2^(6*3)) + b * (2^(6*2)) + c * (2^(6*1)) + d)
+		a = n % 2^8
+		b = math.floor(n/2^8) % 2^8
+		c = math.floor(math.floor(n/2^8)/2^8) % 2^8
+		a,b,c = string.char(a),string.char(b),string.char(c)
+		local st = c .. b .. a
+		st = st:sub(0,len - co)
+		s = s .. st
+		co = co + 3
+	end
+	print(s)
+end
 def_funcs['frombase'] = function()
 	local a,b = reg.pop(),reg.pop()
 	local n = 0
@@ -112,11 +155,15 @@ def_funcs['frombase'] = function()
 		while #b > 0 do
 			local s = b:sub(1,1)
 			b = b:sub(2,#b)
-			s = s:byte()
-			if s >= 48 and s <= 57 then
-				s = string.char(s)
+			if a == 64 then
+				s = b64:find(s)-1
 			else
-				s = s - 55
+				s = s:byte()
+				if s >= 48 and s <= 57 then
+					s = string.char(s)
+				else
+					s = s - 55
+				end
 			end
 			n = n * a + s
 		end
@@ -132,11 +179,15 @@ def_funcs['base'] = function()
 	if(type(b)=='number')then
 		local s = ''
 		while b > 0 do
-			local n = (b % a)
-			if n >= 10 then
-				n = string.char(55 + n)
+			local n = math.floor(b % a)
+			if a == 64 then
+				n = b64:sub(n+1, n+1)
 			else
-				n = math.floor(n)
+				if n >= 10 then
+					n = string.char(55 + n)
+				else
+					n = math.floor(n)
+				end
 			end
 			s = n .. s
 			b = math.floor(b / a)
@@ -317,7 +368,7 @@ end
 def_funcs['function'] = function(i,inp,l)
 	local n = flow_to(i,inp,l).i
 	local f = function()
-		rpn(inp:sub(i+1,n-4),false,l)
+		rpn(inp:sub(i+1,n),false,l)
 	end
 	reg.push(f)
 	return {i = n}
