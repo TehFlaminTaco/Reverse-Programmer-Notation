@@ -71,8 +71,9 @@ def_funcs['randomseed'] = function() math.randomseed(reg.pop()) end
 def_funcs['time'] = function() reg.push(os.time()) end
 def_funcs['len'] = function() local a = reg.pop() if (type(a)=='string') then reg.push(#a) else reg.push(a.len()) end end
 def_funcs['floor'] = function() reg.push(math.floor(reg.pop())) end
+def_funcs['ceil'] = function() reg.push(math.ceil(reg.pop())) end
 def_funcs['sub'] = function() local a,b,c = reg.pop(),reg.pop(),reg.pop() reg.push(c:sub(b,a)) end
-def_funcs['do'] = function(_,_,l) rpn(reg.pop(),false,l) end
+def_funcs['do'] = function(x,y,z,w,r) local a = reg.pop() if type(a)=='string' then rpn(reg.pop(),false,z) else a(x,y,z,w,r) end end
 def_funcs['stack'] = function() reg.push(stack.new()) end
 def_funcs['not'] = function(_,_,f) f['truthy']() reg.push(not reg.pop()) end
 def_funcs['reg'] = function() reg.push(reg) end
@@ -87,6 +88,10 @@ def_funcs['local'] = function(i,inp,f,l) reg.push(l) end
 def_funcs['read'] = function() reg.push(io.read()) end
 def_funcs['find'] = function() local a,b = reg.pop(),reg.pop() reg.push(b:find(a)) end
 def_funcs['rep'] = function() local a,b = reg.pop(),reg.pop() reg.push(b:rep(a)) end
+def_funcs['lower'] = function() reg.push(reg.pop():lower()) end
+def_funcs['upper'] = function() reg.push(reg.pop():upper()) end
+def_funcs['alphabet'] = function() reg.push('abcdefghijklmnopqrstuvwxyz') end
+def_funcs['ALPHABET'] = function() reg.push('ABCDEFGHIJKLMNOPQRSTUVWXYZ') end
 def_funcs['replace'] = function() local a,b,c = reg.pop(),reg.pop(),reg.pop()
 	if(type(a)=='string')then
 		reg.push(c:gsub(b,a))
@@ -121,12 +126,17 @@ end
 def_funcs['base'] = function()
 	local a = reg.pop()
 	local b = reg.pop()
+	if(type(b)=='string')then
+		b = tonumber(b)
+	end
 	if(type(b)=='number')then
 		local s = ''
 		while b > 0 do
 			local n = (b % a)
 			if n >= 10 then
 				n = string.char(55 + n)
+			else
+				n = math.floor(n)
 			end
 			s = n .. s
 			b = math.floor(b / a)
@@ -273,7 +283,7 @@ def_funcs['if_peek'] = function(i,inp,funcs)
 	return t
 end
 
-def_funcs['for'] = function(i, inp, l)
+def_funcs['for'] = function(i, inp, l, _, n)
 	-- a: The loop counter
 	-- b: The maximum / minimum
 	-- c: The increment/decrement value
@@ -300,7 +310,7 @@ def_funcs['for'] = function(i, inp, l)
 		loops.push(c)
 		loops.push(b)
 		loops.push(a)
-		loops.push(i - (#'for'+1))
+		loops.push(n)
 		reg.push(a) -- and give access to a.
 	end
 end
@@ -319,20 +329,20 @@ def_funcs['end'] = function(i,inp)
 		return t
 	end
 end
-def_funcs['while'] = function(i, inp, funcs)
+def_funcs['while'] = function(i, inp, funcs, _, n)
 	funcs['truthy'](i,inp) local case = reg.pop()
 	if case then
-		loops.push(i - (#'while'+1))
+		loops.push(n)
 	else
 		local t = flow_to(i,inp,funcs)
 		return t
 	end
 end
-def_funcs['while_peek'] = function(i, inp, funcs)
+def_funcs['while_peek'] = function(i, inp, funcs, _, n)
 	reg.push(reg.peek())
 	funcs['truthy'](i,inp) local case = reg.pop()
 	if case then
-		loops.push(i - (#'while'+1))
+		loops.push(n)
 	else
 		local t = flow_to(i,inp,funcs)
 		return t
@@ -399,13 +409,13 @@ function rpn(input, doEchoStack, upperLocal)
 	local usedQoute = ''
 	local builtWord = ''
 	local varType = ''
-	local function stuff(i)
+	local function stuff(i,n)
 		if varType == 'String' then
 			reg.push(builtWord)
 		else
 			local f = funcs[builtWord]
 			if f then
-				local b,t = pcall(f, i, input, funcs, locals)
+				local b,t = pcall(f, i, input, funcs, locals, n)
 				if not b then
 					local _,n = input:sub(0,i):gsub('%w+','')
 					print(("-"):rep(20))
@@ -426,6 +436,7 @@ function rpn(input, doEchoStack, upperLocal)
 		return i
 	end
 	local i = 1
+	local n = 0
 	while i <= #input do
 		local s = input:sub(i,i)
 		if s == '"' or s == "'" then
@@ -437,14 +448,14 @@ function rpn(input, doEchoStack, upperLocal)
 				builtWord = builtWord..s
 			end
 		elseif not inString and s:find("%s") then
-			local oli = i
-			i = stuff(i)
+			i = stuff(i,n)
+			n = i
 		else
 			builtWord = builtWord .. s
 		end
 		i = i + 1
 	end
-	stuff(#input)
+	stuff(#input,n)
 	if doEchoStack then
 		local val = reg.pop()
 		while val~=nil do
