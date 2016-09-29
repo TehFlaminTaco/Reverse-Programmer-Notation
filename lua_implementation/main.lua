@@ -42,6 +42,7 @@ function findElse(str)
 	end
 end
 
+def_funcs['.'] = function() local a,b = reg.pop(),reg.pop() reg.push(b..a) end
 def_funcs['-'] = function() local a,b = reg.pop(),reg.pop() reg.push(b-a) end
 def_funcs['*'] = function() local a,b = reg.pop(),reg.pop() reg.push(b*a) end
 def_funcs['/'] = function() local a,b = reg.pop(),reg.pop() reg.push(b/a) end
