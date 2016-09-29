@@ -131,8 +131,9 @@ end
 def_funcs['decode64'] = function()
 	local s = ''
 	local a = reg.pop()
-	local _,c = a:gsub(b64:sub(65,65), '')
-	local len = (a:len()/4)*3 - c
+	local a = a:gsub(b64:sub(65,65), '')
+	local lComp = ((a:len()/4)*3)
+	local len = math.floor(lComp)
 	local co = 0
 	for A,B,C,D in a:gmatch"(.)(.?)(.?)(.?)" do
 		local a,b,c,d = b64:find(A)-1,b64:find(B)-1,b64:find(C)-1,b64:find(D)-1
