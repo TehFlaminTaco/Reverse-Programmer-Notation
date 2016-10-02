@@ -5,12 +5,15 @@ function stack.new(size,t)
 	size = size or -1
 	local holderT = t or {}
 	local st = {}
-	function st.push(val)
-		if(size > -1 and #holderT >= size) then
-			return false
-		else
-			table.insert(holderT, val)
-			return val
+	function st.push(...)
+		local a = {...}
+		for k,val in pairs(a) do
+			if(size > -1 and #holderT >= size) then
+				return false
+			else
+				table.insert(holderT, val)
+				return val
+			end
 		end
 	end
 	function st.pop()

@@ -74,7 +74,7 @@ def_funcs['len'] = function() local a = reg.pop() if (type(a)=='string') then re
 def_funcs['floor'] = function() reg.push(math.floor(reg.pop())) end
 def_funcs['ceil'] = function() reg.push(math.ceil(reg.pop())) end
 def_funcs['sub'] = function() local a,b,c = reg.pop(),reg.pop(),reg.pop() reg.push(c:sub(b,a)) end
-def_funcs['do'] = function(x,y,z,w,r) local a = reg.pop() if type(a)=='string' then rpn(reg.pop(),false,z) else a(x,y,z,w,r) end end
+def_funcs['do'] = function(x,y,z,w,r) local a = reg.pop() if type(a)=='string' then rpn(a,false,z) else a(x,y,z,w,r) end end
 def_funcs['stack'] = function() reg.push(stack.new()) end
 def_funcs['not'] = function(_,_,f) f['truthy']() reg.push(not reg.pop()) end
 def_funcs['reg'] = function() reg.push(reg) end
@@ -93,6 +93,13 @@ def_funcs['lower'] = function() reg.push(reg.pop():lower()) end
 def_funcs['upper'] = function() reg.push(reg.pop():upper()) end
 def_funcs['alphabet'] = function() reg.push('abcdefghijklmnopqrstuvwxyz') end
 def_funcs['ALPHABET'] = function() reg.push('ABCDEFGHIJKLMNOPQRSTUVWXYZ') end
+def_funcs['match'] = function() local a, b = reg.pop(),reg.pop() reg.push(b:match(a)) end
+def_funcs['-0'] = function(_,_,f)
+	local str = reg.pop()
+	str = str:gsub('.','%0 ')
+	reg.push(str)
+	f['do']()
+end
 def_funcs['replace'] = function() local a,b,c = reg.pop(),reg.pop(),reg.pop()
 	if(type(a)=='string')then
 		reg.push(c:gsub(b,a))
@@ -447,6 +454,8 @@ function rpn(input, doEchoStack, upperLocal)
 			else
 				return function() reg.push(v) end
 			end
+		elseif def_funcs[key] then
+			return def_funcs[key]
 		elseif tonumber(key) then
 			return function() reg.push(tonumber(key)) end
 		elseif key:lower()=='true' then
@@ -454,7 +463,6 @@ function rpn(input, doEchoStack, upperLocal)
 		elseif key:lower()=='false' then
 			return function() reg.push(false) end
 		end
-		return def_funcs[key]
 	end})
 	local inString = false
 	local usedQoute = ''
