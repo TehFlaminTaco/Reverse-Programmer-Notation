@@ -96,7 +96,7 @@ def_funcs['ALPHABET'] = function() reg.push('ABCDEFGHIJKLMNOPQRSTUVWXYZ') end
 def_funcs['match'] = function() local a, b = reg.pop(),reg.pop() reg.push(b:match(a)) end
 def_funcs['-0'] = function(_,_,f)
 	local str = reg.pop()
-	str = str:gsub('.','%0 ')
+	str = str:gsub('.[\128-\191]*','%0 ')
 	reg.push(str)
 	f['do']()
 end
@@ -462,6 +462,8 @@ function rpn(input, doEchoStack, upperLocal)
 			return function() reg.push(true) end
 		elseif key:lower()=='false' then
 			return function() reg.push(false) end
+		elseif key:match'^(...)'=="►" then
+			rpn(key:sub(key:find('►')+1):gsub(".[\128-\191]*", "%0 "),false,funcs)
 		end
 	end})
 	local inString = false
