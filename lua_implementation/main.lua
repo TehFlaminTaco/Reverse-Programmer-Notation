@@ -463,7 +463,7 @@ function rpn(input, doEchoStack, upperLocal)
 		elseif key:lower()=='false' then
 			return function() reg.push(false) end
 		elseif key:match'^(...)'=="►" then
-			rpn(key:sub(key:find('►')+1):gsub(".[\128-\191]*", "%0 "),false,funcs)
+			rpn(key:sub(key:find('►')+1):gsub("([\"']?).-.[\128-\191]*%1","%0 "),false,funcs)
 		end
 	end})
 	local inString = false
@@ -500,7 +500,7 @@ function rpn(input, doEchoStack, upperLocal)
 	local n = 0
 	while i <= #input do
 		local s = input:sub(i,i)
-		if s == '"' or s == "'" then
+		if (s == '"' or s == "'") and not builtWord:match"^►" then
 			if (s==usedQoute or not inString) then
 				usedQoute = s
 				inString = not inString
