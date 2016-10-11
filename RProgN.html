@@ -24,6 +24,12 @@
 			document.getElementById('inputs').value = defINP
 		}},1000)
 
+
+		function getlink(){
+			var out = window.location.href.replace(/([^?]*)(\?.*)?/,'$1')+"?rpn="+encodeURIComponent(document.getElementById('CodeInput').value)+"&input="+encodeURIComponent(document.getElementById('inputs').value)
+			document.getElementById('outputURL').value = out
+		}
+
 		function dorpn(){
 			var rpn = document.getElementById('CodeInput').value
 			var inp = document.getElementById('inputs').value
@@ -66,14 +72,16 @@
 	</style>
 </head>
 <body>
-	<textarea name="CodeInput" id="CodeInput"></textarea>
+	<textarea name="CodeInput" id="CodeInput">"Hello, World!" p</textarea>
 	<form>
 		<input type="text" id="inputs" placeholder="Type your inputs in here! Separated by whitespace."></input>
 		<input type="button" value="Run" onclick="dorpn()"></input>
+		<input type="button" value="Get Link" onclick="getlink()"></input>
+		<input type="text" placeholder="Output URL." id="outputURL"></input>
 	</form>
-	<textarea name="Output" id="output"></textarea>
+	<textarea name="Output" id="output">&lt;YOUR OUTPUT GOES HERE&gt;</textarea>
 	<div id="footer">
-		Credit to <a href='https://daurnimator.github.io/lua.vm.js/lua.vm.js.html'>lua.vm.js</a> for their Lua VM. Which actively interprets Reverse Programmer Notation.
+		Credit to <a href='https://daurnimator.github.io/lua.vm.js/lua.vm.js.html'>lua.vm.js</a> for their Lua VM. Which actively interprets Reverse Programmer Notation.<br><a href="https://github.com/TehFlaminTaco/Reverse-Programmer-Notation">Check out the github for Reverse Programmer Notation Here!</a>
 	</div>
 	<script type='N/A' id='RProgN'>
 		local stack = {}
