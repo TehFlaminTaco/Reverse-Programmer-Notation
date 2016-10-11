@@ -1,29 +1,39 @@
-B base
--B frombase
-r reg
-= asoc
-s stack
-S tostack
-i invert
-++ sum
-_ floor
-^^ ceil
-L len
-b byte
-c char
-| split
-! not	
-!! truthy
-‼ truthy
-=> function
-w{ while
-f{ if
-F{ for
-} end
-}{ else
-a alphabet
-A ALPHABET
-l lower
-U upper
-po pop
-P push
+B base			#
+-B frombase		#
+r reg			#
+R replace		#
+= asoc			#
+s stack			#
+S tostack		#
+i invert		#
+++ sum			#
+_ floor			#
+^^ ceil			#
+L len			#
+b byte			#
+c char			#
+| split			#
+! not			#
+!! truthy		#
+‼ truthy		# Alt+19
+=> function		#
+§ function		# Alt+21
+§ function		# Alt+245
+w{ while		#
+f{ if			#
+F{ for			#
+} end			#
+}{ else			#
+a alphabet		#
+A ALPHABET		# 
+l lower			#
+U upper			#
+po pop			#
+P push			#
+? if			#
+¿ while			# Alt+0191
+: for 			#
+º getraw		# Alt+167
+¯ ceil			# Alt+0175
+¡ else			# Alt+173
+× *				# Alt+0215
