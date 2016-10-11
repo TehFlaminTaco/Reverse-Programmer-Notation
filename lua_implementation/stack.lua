@@ -23,7 +23,7 @@ function stack.new(size,t)
 		return #holderT
 	end
 	function st.clone()
-		local clone = stack.new()
+		local clone = stack.new(size)
 		for k,v in ipairs(holderT) do
 			clone.push(v)
 		end
@@ -36,6 +36,15 @@ function stack.new(size,t)
 			end
 		end
 		return false
+	end
+	function st.shuffle()
+		local nST = st.clone()
+		local s = st.len()
+		holderT = {}
+		while nST.len()>0 do
+			local n = math.random(1,#holderT+1)
+			table.insert(holderT, n, nST.pop())
+		end
 	end
 	function st.inverse()
 		local t = {}

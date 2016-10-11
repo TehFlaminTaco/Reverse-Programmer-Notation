@@ -42,7 +42,23 @@ function findElse(str)
 	end
 end
 
-def_funcs['.'] = function() local a,b = reg.pop(),reg.pop() reg.push(b..a) end
+def_funcs['.'] = function(_,_,f) 
+	local a = reg.pop()
+	if(type(a)=='table')then
+		local val = a.pop()
+		local val2 = a.pop()
+		while val2 do
+			reg.push(val)
+			reg.push(val2)
+			f['.']()
+			val = reg.pop()
+			val2 = a.pop()
+		end
+		reg.push(val)
+	else
+		reg.push(reg.pop()..a)
+	end
+end
 def_funcs['-'] = function() local a,b = reg.pop(),reg.pop() reg.push(b-a) end
 def_funcs['*'] = function() local a,b = reg.pop(),reg.pop() reg.push(b*a) end
 def_funcs['/'] = function() local a,b = reg.pop(),reg.pop() reg.push(b/a) end
@@ -58,6 +74,7 @@ def_funcs['<='] = function() local a,b = reg.pop(),reg.pop() reg.push(b <= a) en
 def_funcs['>'] = function() local a,b = reg.pop(),reg.pop() reg.push(b > a) end
 def_funcs['<'] = function() local a,b = reg.pop(),reg.pop() reg.push(b < a) end
 def_funcs['getraw'] = function(_,_,funcs) reg.push(funcs[reg.pop()]) end
+def_funcs['shuffle'] = function() reg.peek().shuffle() end
 def_funcs['Q'] = function(i,inp) reg.push(inp) end
 def_funcs['asoc'] = function() local a = reg.pop() if type(a)=='table' then a[reg.pop()] = reg.pop() else mem[a] = reg.pop() end end
 def_funcs['recall'] = function() reg.push(mem[reg.pop()]) end
@@ -157,7 +174,11 @@ def_funcs['frombase'] = function()
 			local s = b:sub(1,1)
 			b = b:sub(2,#b)
 			if a == 64 then
-				s = b64:find(s)-1
+				if(b64:find(s)-1 < 64) then
+					s = b64:find(s)-1
+				else
+					s = 0
+				end
 			else
 				s = s:byte()
 				if s >= 48 and s <= 57 then
