@@ -16,18 +16,6 @@
 		    return results == null ? null : decodeURIComponent(results[1]);
 		}
 
-		setTimeout(
-		function(){
-		var defRPN = gup('rpn')
-		var defINP = gup('input')
-
-		if(defRPN != null){
-			document.getElementById('CodeInput').value = defRPN
-		}
-		if(defINP != null){
-			document.getElementById('inputs').value = defINP
-		}},1000)
-
 		var main = "";
 		var sugar = "";
 		var stack = "";
@@ -41,6 +29,16 @@
 			}
 		}
 
+		window.onload = function(){
+		var defRPN = gup('rpn')
+		var defINP = gup('input')
+
+		if(defRPN != null){
+			document.getElementById('CodeInput').value = defRPN
+		}
+		if(defINP != null){
+			document.getElementById('inputs').value = defINP
+		}
 		$.get('lua_implementation/stack.lua',function(dat){
 			stack = dat
 			try_complete_code()
@@ -54,7 +52,7 @@
 		$.get('lua_implementation/main.lua',function(dat){
 			main = dat
 			try_complete_code()
-		},"text")
+		},"text")}
 
 		function getlink(){
 			var out = window.location.href.replace(/([^?]*)(\?.*)?/,'$1')+"?rpn="+encodeURIComponent(document.getElementById('CodeInput').value)+"&input="+encodeURIComponent(document.getElementById('inputs').value)
