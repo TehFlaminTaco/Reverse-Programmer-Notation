@@ -64,8 +64,8 @@
 			var rpn = document.getElementById('CodeInput').value
 			var inp = document.getElementById('inputs').value
 			var rpn_code = document.getElementById('RProgN').innerHTML
-			rpn_code = rpn_code.replace(/<CODETORUN>/gi, '[['+rpn.replace(/]]/, ']].."]]"..[[')+']]');
-			var i = inp.replace(/(\s|^)+(("(.*?)")|(\S+))/gi, ', [[$5$4♪').replace(/]]/, ']].."]]"..[[').replace(/♪/,']]')
+			rpn_code = rpn_code.replace(/<CODETORUN>/gi, '[['+rpn.replace(/]]/g, ']].."]]"..[[')+']]');
+			var i = inp.replace(/(\s|^)+(("(.*?)")|(\S+))/gi, ', [[$5$4♪').replace(/]]/g, ']].."]]"..[[').replace(/♪/g,']]')
 			rpn_code = rpn_code.replace(/<INPUTS>/gi, i)
 			document.getElementById('output').value = ''
 			emscripten.print = function(n){document.getElementById('output').value = document.getElementById('output').value + n + "\n"}
