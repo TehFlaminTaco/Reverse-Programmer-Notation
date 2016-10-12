@@ -70,7 +70,6 @@
 			rpn_code = rpn_code.replace(/<INPUTS>/gi, i.replace(/\$/,'$$'))
 			document.getElementById('output').value = ''
 			emscripten.print = function(n){document.getElementById('output').value = document.getElementById('output').value + n + "\n"}
-			console.log(rpn_code)
 			try{L.execute(rpn_code);}
 			catch(e){
 				document.getElementById('output').value = document.getElementById('output').value + e.toString() + "\n"
