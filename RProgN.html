@@ -36,6 +36,7 @@
 			if(main.length>0 && stack.length>0 && sugar.length>0){
 				main = main.replace(/stack=require'stack'/,stack.replace(/return stack/, ''))
 				main = main.replace(/-- START SUGAR LOAD(.|\s)*?-- END SUGAR LOAD/, 'local sugar = [['+sugar+']]')
+				main = main.replace(/-- TRY INPUT(.|\s)*?-- END TRY INPUT/, 'input = arg[1]')
 				document.getElementById('RProgN').innerHTML = "arg = {<CODETORUN><INPUTS>}"+main
 			}
 		}
@@ -64,9 +65,9 @@
 			var rpn = document.getElementById('CodeInput').value
 			var inp = document.getElementById('inputs').value
 			var rpn_code = document.getElementById('RProgN').innerHTML
-			rpn_code = rpn_code.replace(/<CODETORUN>/gi, '[['+rpn.replace(/]]/g, ']].."]]"..[[')+']]');
+			rpn_code = rpn_code.replace(/<CODETORUN>/gi, '[['+rpn.replace(/]]/g, ']].."]]"..[[').replace(/\$/,'$$')+']]');
 			var i = inp.replace(/(\s|^)+(("(.*?)")|(\S+))/gi, ', [[$5$4♪').replace(/]]/g, ']].."]]"..[[').replace(/♪/g,']]')
-			rpn_code = rpn_code.replace(/<INPUTS>/gi, i)
+			rpn_code = rpn_code.replace(/<INPUTS>/gi, i.replace(/\$/,'$$'))
 			document.getElementById('output').value = ''
 			emscripten.print = function(n){document.getElementById('output').value = document.getElementById('output').value + n + "\n"}
 			console.log(rpn_code)

@@ -6,7 +6,10 @@ reg = stack.new()
 loops = stack.new()
 mem = {}
 
+-- TRY INPUT
 input = io.open(arg[1]):read('*a')
+-- END TRY INPUT
+
 for k,v in ipairs(arg) do
 	if k > 1 then
 		reg.push(v)
