@@ -35,7 +35,7 @@
 		function try_complete_code(){
 			if(main.length>0 && stack.length>0 && sugar.length>0){
 				main = main.replace(/stack=require'stack'/,stack.replace(/return stack/, ''))
-				main = main.replace(/-- START SUGAR LOAD(.|\s)*?-- END SUGAR LOAD/, '[['+sugar+']]')
+				main = main.replace(/-- START SUGAR LOAD(.|\s)*?-- END SUGAR LOAD/, 'local sugar = [['+sugar+']]')
 				document.getElementById('RProgN').innerHTML = "arg = {<CODETORUN><INPUTS>}"+main
 			}
 		}
