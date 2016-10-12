@@ -59,6 +59,12 @@ def_funcs['.'] = function(_,_,f)
 		reg.push(reg.pop()..a)
 	end
 end
+def_funcs['x'] = function() reg.push('x') end
+def_funcs['y'] = function() reg.push('y') end
+def_funcs['z'] = function() reg.push('z') end
+def_funcs['X'] = function() reg.push('X') end
+def_funcs['Y'] = function() reg.push('Y') end
+def_funcs['Z'] = function() reg.push('Z') end
 def_funcs['-'] = function() local a,b = reg.pop(),reg.pop() reg.push(b-a) end
 def_funcs['*'] = function() local a,b = reg.pop(),reg.pop() reg.push(b*a) end
 def_funcs['/'] = function() local a,b = reg.pop(),reg.pop() reg.push(b/a) end
