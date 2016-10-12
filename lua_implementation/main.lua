@@ -462,13 +462,13 @@ flow.push(def_funcs['function'])
 -- START SUGAR LOAD
 local sugar = io.open('sugar.txt')
 sugar = sugar:read('*a')
+-- END SUGAR LOAD
 for str in sugar:gmatch"[^\r\n]*" do
 	local a,b = str:match("(%S+)%s+(%S+)")
 	if a and b and def_funcs[b] then
 		def_funcs[a] = def_funcs[b]
 	end
 end
--- END SUGAR LOAD
 
 function rpn(input, doEchoStack, upperLocal)
 	local locals = setmetatable({},{__index = upperLocal})
