@@ -16,12 +16,20 @@ for k,v in ipairs(arg) do
 	end
 end
 def_funcs = {}
-def_funcs['+'] = function()
+def_funcs['+'] = function(...)
 	local a, b = reg.pop(), reg.pop()
-	if not tonumber(a) or not tonumber(b) then
-		reg.push(b..a)
+	if(type(b)=="table")then
+		b.replace_all(function(x) return x + a end)
+		reg.push(b)
+	elseif(type(a)=='table')then
+		reg.push(b) reg.push(a)
+		def_funcs['sum'](...) -- Just sum the bastard instead of trying to add it to something.
 	else
-		reg.push(a+b)
+		if not tonumber(a) or not tonumber(b) then
+			reg.push(b..a)
+		else
+			reg.push(a+b)
+		end
 	end
 end
 
@@ -68,11 +76,57 @@ def_funcs['z'] = function() reg.push('z') end
 def_funcs['X'] = function() reg.push('X') end
 def_funcs['Y'] = function() reg.push('Y') end
 def_funcs['Z'] = function() reg.push('Z') end
-def_funcs['-'] = function() local a,b = reg.pop(),reg.pop() reg.push(b-a) end
-def_funcs['*'] = function() local a,b = reg.pop(),reg.pop() reg.push(b*a) end
-def_funcs['/'] = function() local a,b = reg.pop(),reg.pop() reg.push(b/a) end
-def_funcs['//'] = function() local a,b = reg.pop(),reg.pop() reg.push(math.floor(b/a)) end
-def_funcs['^'] = function() local a,b = reg.pop(),reg.pop() reg.push(b^a) end
+def_funcs['-'] = function()
+	local a,b = reg.pop(),reg.pop()
+	if type(b)=='table' then
+		b.replace_all(function(z) return z-a end)
+		reg.push(b)
+	elseif type(a)=='table' then
+		a.replace_all(function(z) return b-z end)
+		reg.push(a)
+	else
+		reg.push(b-a)
+	end
+end
+def_funcs['*'] = function()
+	local a,b = reg.pop(),reg.pop()
+	if type(b)=='table' then
+		b.replace_all(function(z) return z*a end)
+		reg.push(b)
+	else
+		reg.push(b*a)
+	end
+end
+def_funcs['/'] = function()
+	local a,b = reg.pop(),reg.pop()
+	if type(b)=='table' then
+		b.replace_all(function(z) return z/a end)
+		reg.push(b)
+	else
+		reg.push(b/a)
+	end
+end
+def_funcs['//'] = function()
+	local a,b = reg.pop(),reg.pop()
+	if type(b)=='table' then
+		b.replace_all(function(z) return math.floor(z/a) end)
+		reg.push(b)
+	else
+		reg.push(math.floor(b/a))
+	end
+end
+def_funcs['^'] = function()
+	local a,b = reg.pop(),reg.pop()
+	if type(b)=='table' then
+		b.replace_all(function(z) return z^a end)
+		reg.push(b)
+	elseif type(a)=='table' then
+		a.replace_all(function(z) return b^z end)
+		reg.push(a)
+	else
+		reg.push(b^a)
+	end
+end
 def_funcs[']'] = function() reg.push(reg.peek()) end
 def_funcs['['] = function() reg.pop() end
 def_funcs['\\'] = function() local a,b = reg.pop(), reg.pop() reg.push(a) reg.push(b) end
@@ -87,19 +141,76 @@ def_funcs['shuffle'] = function() reg.peek().shuffle() end
 def_funcs['Q'] = function(i,inp) reg.push(inp) end
 def_funcs['asoc'] = function() local a = reg.pop() if type(a)=='table' then a[reg.pop()] = reg.pop() else mem[a] = reg.pop() end end
 def_funcs['recall'] = function() reg.push(mem[reg.pop()]) end
-def_funcs['char'] = function() reg.push(string.char(reg.pop())) end
-def_funcs['byte'] = function() reg.push(string.byte(reg.pop())) end
-def_funcs['%'] = function() local a,b = reg.pop(),reg.pop() reg.push(b % a) end
-def_funcs['max'] = function() reg.push(math.max(reg.pop(),reg.pop())) end
-def_funcs['min'] = function() reg.push(math.min(reg.pop(),reg.pop())) end
+def_funcs['char'] = function()
+	local a = reg.pop()
+	if(type(a)=='table')then
+		a.replace_all(string.char)
+		reg.push(a)
+	else
+		reg.push(string.char(a))
+	end
+end
+def_funcs['byte'] = function()
+	local a = reg.pop()
+	if(type(a)=='table')then
+		a.replace_all(string.byte)
+		reg.push(a)
+	else
+		reg.push(string.byte(a))
+	end
+end
+def_funcs['%'] = function()
+	local a,b = reg.pop(),reg.pop()
+	if type(b)=='table' then
+		b.replace_all(function(z) return z % a end)
+		reg.push(b)
+	elseif type(a)=='table' then
+		a.replace_all(function(z) return b % z end)
+		reg.push(b)
+	else
+		reg.push(b % a)
+	end
+end
+def_funcs['max'] = function()
+	local a = reg.pop()
+	if(type(a)=='table')then
+		reg.push(a.apply(math.max))
+	else
+		reg.push(math.max(a,reg.pop()))
+	end
+end
+def_funcs['min'] = function()
+	local a = reg.pop()
+	if(type(a)=='table')then
+		reg.push(a.apply(math.min))
+	else
+		reg.push(math.min(a,reg.pop()))
+	end
+end
 def_funcs['p'] = function() print(reg.pop()) end
 def_funcs['w'] = function() io.write(reg.pop()) end
 def_funcs['rand'] = function()local b = reg.pop()if(type(b)=='table')then local i = math.random(b.len())local s = b.clone()local o = nil for z=1, i do o = s.pop()end reg.push(o)else local a = reg.pop() reg.push(math.random()*(b-a)+a) end end
 def_funcs['randomseed'] = function() math.randomseed(reg.pop()) end
 def_funcs['time'] = function() reg.push(os.time()) end
 def_funcs['len'] = function() local a = reg.pop() if (type(a)=='string') then reg.push(#a) else reg.push(a.len()) end end
-def_funcs['floor'] = function() reg.push(math.floor(reg.pop())) end
-def_funcs['ceil'] = function() reg.push(math.ceil(reg.pop())) end
+def_funcs['floor'] = function()
+	local a = reg.pop()
+	if(type(a)=='table')then
+		a.replace_all(function(z)return math.floor(z)end)
+		reg.push(a)
+	else
+		reg.push(math.floor(reg.pop()))
+	end
+end
+def_funcs['ceil'] = function()
+	local a = reg.pop()
+	if(type(a)=='table')then
+		a.replace_all(function(z)return math.ceil(z)end)
+		reg.push(a)
+	else
+		reg.push(math.floor(reg.pop()))
+	end
+end
 def_funcs['sub'] = function() local a,b,c = reg.pop(),reg.pop(),reg.pop() reg.push(c:sub(b,a)) end
 def_funcs['do'] = function(x,y,z,w,r) local a = reg.pop() if type(a)=='string' then rpn(a,false,z) else a(x,y,z,w,r) end end
 def_funcs['stack'] = function() reg.push(stack.new()) end
@@ -109,6 +220,23 @@ def_funcs['push'] = function() local a,b = reg.pop(),reg.pop() b.push(a) end
 def_funcs['pop'] = function() reg.push(reg.pop().pop()) end
 def_funcs['peek'] = function() reg.push(reg.pop().peek()) end
 def_funcs['hasvalue'] = function() local a,b = reg.pop(),reg.pop() reg.push(b.hasValue(a)) end
+def_funcs['delta'] = function()
+	local a = reg.pop()
+	if type(a)=='table' then
+		local nt = stack.new(a.size~=-1 and a.size-1) -- Pushes nil if a's size is negative 1, aka, infinite, which will intern make the new stack infinite. Otherwise, one slice smaller.
+		local a = a.clone()							  -- I still NEVER use the size. True as of 13/10/16 5:31 AEST
+		local z = a.pop()
+		while a.len() > 0 do
+			local Z = a.pop()
+			nt.push(z - Z) -- Does polarity of the delta REALLLLY matter to you people? Probably.
+			z = Z
+		end
+		nt.invert()
+		reg.push(nt)
+	else -- Why are you doing this on a non-stack. Why do you hate me?
+		reg.push(a - reg.pop())
+	end
+end
 def_funcs['exit'] = function() return {i = math.huge} end
 def_funcs['mem'] = function() reg.push(mem) end
 def_funcs['flow'] = function() reg.push(flow) end
@@ -121,6 +249,41 @@ def_funcs['upper'] = function() reg.push(reg.pop():upper()) end
 def_funcs['alphabet'] = function() reg.push('abcdefghijklmnopqrstuvwxyz') end
 def_funcs['ALPHABET'] = function() reg.push('ABCDEFGHIJKLMNOPQRSTUVWXYZ') end
 def_funcs['match'] = function() local a, b = reg.pop(),reg.pop() reg.push(b:match(a)) end
+def_funcs['and'] = function()
+	local a = reg.pop()
+	local v = false
+	if type(a)=='table' then
+		local a = stack.new(-1,a.inverse())
+		while a.len()>0 do
+			local z = a.pop()
+			if not z then
+				reg.push(false)
+				return
+			else
+				v = z
+			end
+		end
+		reg.push(v)
+	else
+		return reg.pop() and a
+	end
+end
+def_funcs['or'] = function()
+	local a = reg.pop()
+	if type(a)=='table' then
+		local a = stack.new(-1,a.inverse())
+		while a.len()>0 do
+			local z = a.pop()
+			if z then
+				reg.push(z)
+				return
+			end
+		end
+		reg.push('false')
+	else
+		return reg.pop() or a
+	end
+end
 def_funcs['-0'] = function(_,_,f)
 	local str = reg.pop()
 	str = str:gsub('.[\128-\191]*','%0 ')

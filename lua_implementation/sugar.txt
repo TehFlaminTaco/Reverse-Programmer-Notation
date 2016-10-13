@@ -43,3 +43,6 @@ g getraw		#
 ⌂ local			# Alt+127
 ≡ ==			# Pretty sure this one is untypeable on my keyboard.
 æ foreach		# Alt+145
+d delta			#
+& and			# 
+| or			#

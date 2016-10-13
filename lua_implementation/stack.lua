@@ -1,6 +1,8 @@
 local stack = {}
 local meta = {}
 
+local unpack = unpack or table.unpack -- WHO DID THIS, WHO MADE UNPACK NON-GLOBAL RANDOMLY?
+
 function stack.new(size,t)
 	size = size or -1
 	local holderT = t or {}
@@ -67,6 +69,10 @@ function stack.new(size,t)
 			end
 			-- More types in future?
 		end
+	end
+
+	function st.apply(f) -- IT WAS JAVASCRIPT'S IDEA IS SWEAR!
+		return f(unpack(holderT))
 	end
 	st.size = size
 	return st
