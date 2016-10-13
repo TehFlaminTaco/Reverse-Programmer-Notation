@@ -60,6 +60,15 @@ function stack.new(size,t)
 		holderT = st.inverse()
 		return st
 	end
+	function st.replace_all(n)
+		for k,v in ipairs(holderT) do
+			if(type(n)=="function")then
+				holderT[k] = n(v)
+			end
+			-- More types in future?
+		end
+	end
+	st.size = size
 	return st
 end
 

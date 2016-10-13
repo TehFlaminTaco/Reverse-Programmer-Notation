@@ -93,6 +93,7 @@ def_funcs['%'] = function() local a,b = reg.pop(),reg.pop() reg.push(b % a) end
 def_funcs['max'] = function() reg.push(math.max(reg.pop(),reg.pop())) end
 def_funcs['min'] = function() reg.push(math.min(reg.pop(),reg.pop())) end
 def_funcs['p'] = function() print(reg.pop()) end
+def_funcs['w'] = function() io.write(reg.pop()) end
 def_funcs['rand'] = function()local b = reg.pop()if(type(b)=='table')then local i = math.random(b.len())local s = b.clone()local o = nil for z=1, i do o = s.pop()end reg.push(o)else local a = reg.pop() reg.push(math.random()*(b-a)+a) end end
 def_funcs['randomseed'] = function() math.randomseed(reg.pop()) end
 def_funcs['time'] = function() reg.push(os.time()) end
@@ -126,11 +127,21 @@ def_funcs['-0'] = function(_,_,f)
 	reg.push(str)
 	f['do']()
 end
-def_funcs['replace'] = function() local a,b,c = reg.pop(),reg.pop(),reg.pop()
+def_funcs['foreach'] = function(...)
+	local b, a = reg.pop(),reg.pop()
+	while a.len()>0 do
+		reg.push(a.pop()) b(...)
+	end
+end
+def_funcs['replace'] = function() local a,b = reg.pop(),reg.pop()
 	if(type(a)=='string')then
-		reg.push(c:gsub(b,a))
+		reg.push(reg.pop():gsub(b,a))
 	else
-		reg.push(c:gsub(b,function(...) for k,v in pairs({...}) do reg.push(v) end a() return reg.pop() end))
+		if(type(b)=='string')then
+			reg.push(reg.pop():gsub(b,function(...) for k,v in pairs({...}) do reg.push(v) end a() return reg.pop() end))
+		else
+			b.replace_all(function(z) reg.push(z) a() return reg.pop() end)
+		end
 	end
 end
 def_funcs['map'] = function(_,_,fu)
