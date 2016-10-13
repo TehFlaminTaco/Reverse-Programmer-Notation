@@ -16,6 +16,14 @@
 		    return results == null ? null : decodeURIComponent(results[1]);
 		}
 
+		function byteCount(s){
+			return encodeURI(s).split(/%(?:u[0-9A-F]{2})?[0-9A-F]{2}|./).length - 1;
+		}
+
+		setInterval(function(){
+			document.getElementById('howmanybyes').innerHTML = byteCount(document.getElementById('CodeInput').value)+" Bytes"
+		},500)
+
 		var main = "";
 		var sugar = "";
 		var stack = "";
@@ -100,6 +108,7 @@
 	<textarea name="CodeInput" id="CodeInput">"Hello, World!" p</textarea>
 	<form>
 		<input type="text" id="inputs" placeholder="Type your inputs in here! Separated by whitespace."></input>
+		<p id='howmanybyes'>0 Bytes</p>
 		<input type="button" value="Run" onclick="dorpn()"></input>
 		<input type="button" value="Get Link" onclick="getlink()"></input>
 		<input type="text" placeholder="Output URL." id="outputURL"></input>
