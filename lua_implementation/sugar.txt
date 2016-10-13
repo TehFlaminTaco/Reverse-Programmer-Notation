@@ -37,3 +37,8 @@ P push			#
 ¯ ceil			# Alt+0175
 ¡ else			# Alt+173
 × *				# Alt+0215
+g getraw		#
+‡ sum			# Alt+0135
+☼ pop			# Alt+15
+⌂ local			# Alt+127
+≡ ==			# Pretty sure this one is untypeable on my keyboard.

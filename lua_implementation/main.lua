@@ -496,7 +496,7 @@ function rpn(input, doEchoStack, upperLocal)
 		elseif key:lower()=='false' then
 			return function() reg.push(false) end
 		elseif key:match'^(...)'=="►" then
-			rpn(key:sub(key:find('►')+1):gsub("([\"']?).-.[\128-\191]*%1","%0 "),false,funcs)
+			rpn(key:sub(key:find('►')+3):gsub(".-[\128-\191]*","%0 "):gsub("((['\"]).-%2)",function(s)return s:gsub('(.)%s','%1')end),false,funcs)
 		end
 	end})
 	local inString = false
@@ -504,7 +504,7 @@ function rpn(input, doEchoStack, upperLocal)
 	local builtWord = ''
 	local varType = ''
 	local function stuff(i,n)
-		if varType == 'String' then
+		if varType == 'String' and not (builtWord:match'^(...)'=="►") then
 			reg.push(builtWord)
 		else
 			local f = funcs[builtWord]
