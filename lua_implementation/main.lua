@@ -199,7 +199,7 @@ def_funcs['floor'] = function()
 		a.replace_all(function(z)return math.floor(z)end)
 		reg.push(a)
 	else
-		reg.push(math.floor(reg.pop()))
+		reg.push(math.floor(a))
 	end
 end
 def_funcs['ceil'] = function()
@@ -208,7 +208,7 @@ def_funcs['ceil'] = function()
 		a.replace_all(function(z)return math.ceil(z)end)
 		reg.push(a)
 	else
-		reg.push(math.floor(reg.pop()))
+		reg.push(math.ceil(a))
 	end
 end
 def_funcs['sub'] = function() local a,b,c = reg.pop(),reg.pop(),reg.pop() reg.push(c:sub(b,a)) end
