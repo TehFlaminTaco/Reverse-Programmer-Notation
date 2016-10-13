@@ -141,6 +141,7 @@ def_funcs['replace'] = function() local a,b = reg.pop(),reg.pop()
 			reg.push(reg.pop():gsub(b,function(...) for k,v in pairs({...}) do reg.push(v) end a() return reg.pop() end))
 		else
 			b.replace_all(function(z) reg.push(z) a() return reg.pop() end)
+			reg.push(b)
 		end
 	end
 end
