@@ -56,6 +56,7 @@ end
 def_funcs['.'] = function(_,_,f) 
 	local a = reg.pop()
 	if(type(a)=='table')then
+		local a = a.clone()
 		local val = a.pop()
 		local val2 = a.pop()
 		while val2 do
@@ -69,6 +70,7 @@ def_funcs['.'] = function(_,_,f)
 	else
 		local b = reg.pop()
 		if type(b)=='table' then
+			local b = b.clone()
 			local val = b.pop()
 			local val2 = b.pop()
 			while val2 do
@@ -95,9 +97,11 @@ def_funcs['Z'] = function() reg.push('Z') end
 def_funcs['-'] = function()
 	local a,b = reg.pop(),reg.pop()
 	if type(b)=='table' then
+		local b = b.clone()
 		b.replace_all(function(z) return z-a end)
 		reg.push(b)
 	elseif type(a)=='table' then
+		local a = a.clone()
 		a.replace_all(function(z) return b-z end)
 		reg.push(a)
 	else
@@ -107,17 +111,33 @@ end
 def_funcs['*'] = function()
 	local a,b = reg.pop(),reg.pop()
 	if type(b)=='table' then
+		local b = b.clone()
 		b.replace_all(function(z) return z*a end)
 		reg.push(b)
 	else
-		reg.push(b*a)
+		if(type(a)=='table')then
+			reg.push(b)
+			local a = a.clone()
+			local n = 1
+			while a.len()>0 do
+				n = n * a.pop()
+			end
+			reg.push(n)
+		else
+			reg.push(b*a)
+		end
 	end
 end
 def_funcs['/'] = function()
 	local a,b = reg.pop(),reg.pop()
 	if type(b)=='table' then
+		local b = b.clone()
 		b.replace_all(function(z) return z/a end)
 		reg.push(b)
+	elseif type(a)=='table' then
+		local a = a.clone()
+		a.replace_all(function(z) return b/z end)
+		reg.push(a)
 	else
 		reg.push(b/a)
 	end
@@ -125,8 +145,13 @@ end
 def_funcs['//'] = function()
 	local a,b = reg.pop(),reg.pop()
 	if type(b)=='table' then
+		local b = b.clone()
 		b.replace_all(function(z) return math.floor(z/a) end)
 		reg.push(b)
+	elseif type(a)=='table' then
+		local a = a.clone()
+		a.replace_all(function(z) return math.floor(b/z) end)
+		reg.push(a)
 	else
 		reg.push(math.floor(b/a))
 	end
@@ -134,9 +159,11 @@ end
 def_funcs['^'] = function()
 	local a,b = reg.pop(),reg.pop()
 	if type(b)=='table' then
+		local b = b.clone()
 		b.replace_all(function(z) return z^a end)
 		reg.push(b)
 	elseif type(a)=='table' then
+		local b = b.clone()
 		a.replace_all(function(z) return b^z end)
 		reg.push(a)
 	else
@@ -427,6 +454,7 @@ end
 def_funcs['sum'] = function(_,_,f)
 	local a = reg.pop()
 	if(type(a)=='table')then
+		local a = a.clone()
 		local val = a.pop()
 		local val2 = a.pop()
 		while val2 do
