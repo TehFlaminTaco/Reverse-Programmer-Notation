@@ -67,7 +67,23 @@ def_funcs['.'] = function(_,_,f)
 		end
 		reg.push(val)
 	else
-		reg.push(reg.pop()..a)
+		local b = reg.pop()
+		if type(b)=='table' then
+			local val = b.pop()
+			local val2 = b.pop()
+			while val2 do
+				reg.push(val)
+				reg.push(a)
+				reg.push(val2)
+				f['.']()
+				f['.']()
+				val = reg.pop()
+				val2 = b.pop()
+			end
+			reg.push(val)
+		else
+			reg.push(b..a)
+		end
 	end
 end
 def_funcs['x'] = function() reg.push('x') end
