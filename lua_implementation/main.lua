@@ -18,6 +18,13 @@ end
 def_funcs = {}
 def_funcs['+'] = function(...)
 	local a, b = reg.pop(), reg.pop()
+	if type(a)=='boolean' then
+		a = a and 1 or 0
+	end
+	if type(b)=='boolean' then
+		b = b and 1 or 0
+	end
+	
 	if(type(b)=="table")then
 		b.replace_all(function(x) return x + a end)
 		reg.push(b)
@@ -96,6 +103,12 @@ def_funcs['Y'] = function() reg.push('Y') end
 def_funcs['Z'] = function() reg.push('Z') end
 def_funcs['-'] = function()
 	local a,b = reg.pop(),reg.pop()
+	if type(a)=='boolean' then
+		a = a and 1 or 0
+	end
+	if type(b)=='boolean' then
+		b = b and 1 or 0
+	end
 	if type(b)=='table' then
 		local b = b.clone()
 		b.replace_all(function(z) return z-a end)
@@ -110,6 +123,12 @@ def_funcs['-'] = function()
 end
 def_funcs['*'] = function()
 	local a,b = reg.pop(),reg.pop()
+	if type(a)=='boolean' then
+		a = a and 1 or 0
+	end
+	if type(b)=='boolean' then
+		b = b and 1 or 0
+	end
 	if type(b)=='table' then
 		local b = b.clone()
 		b.replace_all(function(z) return z*a end)
@@ -120,7 +139,11 @@ def_funcs['*'] = function()
 			local a = a.clone()
 			local n = 1
 			while a.len()>0 do
-				n = n * a.pop()
+				local z = a.pop()
+				if type(z)=='boolean' then
+					z = z and 1 or 0
+				end
+				n = n * z
 			end
 			reg.push(n)
 		else
@@ -130,6 +153,12 @@ def_funcs['*'] = function()
 end
 def_funcs['/'] = function()
 	local a,b = reg.pop(),reg.pop()
+	if type(a)=='boolean' then
+		a = a and 1 or 0
+	end
+	if type(b)=='boolean' then
+		b = b and 1 or 0
+	end
 	if type(b)=='table' then
 		local b = b.clone()
 		b.replace_all(function(z) return z/a end)
@@ -144,6 +173,12 @@ def_funcs['/'] = function()
 end
 def_funcs['//'] = function()
 	local a,b = reg.pop(),reg.pop()
+	if type(a)=='boolean' then
+		a = a and 1 or 0
+	end
+	if type(b)=='boolean' then
+		b = b and 1 or 0
+	end
 	if type(b)=='table' then
 		local b = b.clone()
 		b.replace_all(function(z) return math.floor(z/a) end)
@@ -158,6 +193,12 @@ def_funcs['//'] = function()
 end
 def_funcs['^'] = function()
 	local a,b = reg.pop(),reg.pop()
+	if type(a)=='boolean' then
+		a = a and 1 or 0
+	end
+	if type(b)=='boolean' then
+		b = b and 1 or 0
+	end
 	if type(b)=='table' then
 		local b = b.clone()
 		b.replace_all(function(z) return z^a end)
@@ -170,6 +211,19 @@ def_funcs['^'] = function()
 		reg.push(b^a)
 	end
 end
+def_funcs['sqrt'] = function()
+	local a = reg.pop()
+	if type(a)=='boolean' then
+		a = a and 1 or 0
+	end
+	if type(a)=='table' then
+		local b = b.clone()
+		a.replace_all(function(z) return math.sqrt(z) end)
+		reg.push(a)
+	else
+		reg.push(math.sqrt(a))
+	end
+end
 def_funcs[']'] = function() reg.push(reg.peek()) end
 def_funcs['['] = function() reg.pop() end
 def_funcs['\\'] = function() local a,b = reg.pop(), reg.pop() reg.push(a) reg.push(b) end
@@ -179,6 +233,21 @@ def_funcs['>='] = function() local a,b = reg.pop(),reg.pop() reg.push(b >= a) en
 def_funcs['<='] = function() local a,b = reg.pop(),reg.pop() reg.push(b <= a) end
 def_funcs['>'] = function() local a,b = reg.pop(),reg.pop() reg.push(b > a) end
 def_funcs['<'] = function() local a,b = reg.pop(),reg.pop() reg.push(b < a) end
+def_funcs['to'] = function()
+	local a, b = reg.pop(),reg.pop()
+	local o = stack.new()
+	if type(a) == 'number' then
+		for i=b, a, a > b and 1 or -1 do
+			o.push(i)
+		end
+	else
+		for i=b:byte(), a:byte(), a:byte() > b:byte() and 1 or -1 do
+			o.push(string.char(i))
+		end
+	end
+	reg.push(o)
+
+end
 def_funcs['getraw'] = function(_,_,funcs) reg.push(funcs[reg.pop()]) end
 def_funcs['shuffle'] = function() reg.peek().shuffle() end
 def_funcs['Q'] = function(i,inp) reg.push(inp) end
@@ -198,12 +267,24 @@ def_funcs['byte'] = function()
 	if(type(a)=='table')then
 		a.replace_all(string.byte)
 		reg.push(a)
+	elseif #a > 1 then
+		local o = stack.new()
+		for i=1, #a do
+			o.push(string.byte(a:sub(i,i)))
+		end
+		reg.push(o)
 	else
 		reg.push(string.byte(a))
 	end
 end
 def_funcs['%'] = function()
 	local a,b = reg.pop(),reg.pop()
+	if type(a)=='boolean' then
+		a = a and 1 or 0
+	end
+	if type(b)=='boolean' then
+		b = b and 1 or 0
+	end
 	if type(b)=='table' then
 		b.replace_all(function(z) return z % a end)
 		reg.push(b)
@@ -216,6 +297,12 @@ def_funcs['%'] = function()
 end
 def_funcs['max'] = function()
 	local a = reg.pop()
+	if type(a)=='boolean' then
+		a = a and 1 or 0
+	end
+	if type(b)=='boolean' then
+		b = b and 1 or 0
+	end
 	if(type(a)=='table')then
 		reg.push(a.apply(math.max))
 	else
@@ -224,6 +311,12 @@ def_funcs['max'] = function()
 end
 def_funcs['min'] = function()
 	local a = reg.pop()
+	if type(a)=='boolean' then
+		a = a and 1 or 0
+	end
+	if type(b)=='boolean' then
+		b = b and 1 or 0
+	end
 	if(type(a)=='table')then
 		reg.push(a.apply(math.min))
 	else
@@ -334,7 +427,7 @@ def_funcs['-0'] = function(_,_,f)
 	f['do']()
 end
 def_funcs['foreach'] = function(...)
-	local b, a = reg.pop(),reg.pop()
+	local b, a = reg.pop(),reg.pop().clone()
 	while a.len()>0 do
 		reg.push(a.pop()) b(...)
 	end
@@ -431,6 +524,8 @@ def_funcs['base'] = function()
 	local b = reg.pop()
 	if(type(b)=='string')then
 		b = tonumber(b)
+	end
+	if(type(b)=='table')then
 	end
 	if(type(b)=='number')then
 		local s = ''
@@ -625,7 +720,7 @@ end
 def_funcs['function'] = function(i,inp,l)
 	local n = flow_to(i,inp,l).i
 	local f = function()
-		rpn(inp:sub(i+1,n),false,l)
+		rpn(inp:sub(i+1,n-2),false,l)
 	end
 	reg.push(f)
 	return {i = n}
