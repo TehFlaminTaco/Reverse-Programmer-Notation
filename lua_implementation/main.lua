@@ -224,6 +224,7 @@ def_funcs['sqrt'] = function()
 		reg.push(math.sqrt(a))
 	end
 end
+def_funcs['t'] = function() reg.push(10) end
 def_funcs[']'] = function() reg.push(reg.peek()) end
 def_funcs['['] = function() reg.pop() end
 def_funcs['\\'] = function() local a,b = reg.pop(), reg.pop() reg.push(a) reg.push(b) end
@@ -581,8 +582,23 @@ def_funcs['type'] = function()
 	end
 end
 def_funcs['tostack'] = function(_,_,f)
-	reg.push('.')
-	f['split']()
+	local a = reg.pop()
+	if(type(a)=='string') then
+		reg.push(a)
+		reg.push('.')
+		f['split']()
+	elseif(type(a)=='number')then
+		local b = reg.pop()
+		local s = stack.new()
+		if(type(b)=='function')then
+			for i=1, a do
+				reg.push(i)
+				b()
+				s.push(reg.pop())
+			end
+		end
+		reg.push(s)
+	end
 end
 def_funcs['split'] = function()
 	local b, a = reg.pop(), reg.pop()
@@ -597,6 +613,42 @@ def_funcs['inverse'] = function()
 end
 def_funcs['invert'] = function()
 	reg.push(reg.pop().invert())
+end
+def_funcs['rotate_r'] = function()
+	local a = reg.pop()
+	if type(a)=='string' then
+		reg.push(a:sub(#a,#a)..a:sub(1,#a-1))
+	elseif type(a)=='table' then
+		local newStack = stack.new(a.size)
+		a.apply(function(...)
+			o = {...} -- I've cheated to get every value from stack a how I like it.
+			newStack.push(o[#o])
+			for i=1, #o-1 do
+				newStack.push(o[i])
+			end
+		end)
+		reg.push(newStack)
+	elseif type(a)=='number' then
+
+	end
+end
+def_funcs['rotate_l'] = function()
+	local a = reg.pop()
+	if type(a)=='string' then
+		reg.push(a:sub(2,#a) .. a:sub(1,1))
+	elseif type(a)=='table' then
+		local newStack = stack.new(a.size)
+		a.apply(function(...)
+			o = {...} -- I've cheated to get every value from stack a how I like it.
+			for i=2, #o do
+				newStack.push(o[i])
+			end
+			newStack.push(o[1])
+		end)
+		reg.push(newStack)
+	elseif type(a)=='number' then
+		
+	end
 end
 def_funcs['get'] = function()
 	local a, b = reg.pop(), reg.pop()

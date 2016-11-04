@@ -1,4 +1,4 @@
-B base			#
+﻿B base			#
 -B frombase		#
 r reg			#
 R replace		#
@@ -36,7 +36,7 @@ P push			#
 º getraw		# Alt+167
 ¯ ceil			# Alt+0175
 ¡ else			# Alt+173
-× *				# Alt+0215
+× *			# Alt+0215
 g getraw		#
 ‡ sum			# Alt+0135
 ☼ pop			# Alt+15
@@ -46,3 +46,7 @@ g getraw		#
 d delta			#
 & and			# 
 | or			#
+→ rotate_r		# Alt+26
+← rotate_l		# Alt+27
+▬ to 			# Alt+22
+{ function		#
