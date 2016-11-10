@@ -28,6 +28,10 @@ for k,v in ipairs(arg) do
 					end
 				end
 			end
+			if val then
+				s.push(val)
+			end
+			s.invert()
 			reg.push(s)
 		else
 			reg.push(v)
