@@ -12,7 +12,26 @@ input = io.open(arg[1]):read('*a')
 
 for k,v in ipairs(arg) do
 	if k > 1 then
-		reg.push(v)
+		if v:match("^{}$") then
+			local s = stack.new()
+			local inString = false
+			local val = ''
+			for S in v:gsub("^{",""):gsub("}$",""):gmatch(".") do
+				if S == "'" then
+					inString = not inString
+				else
+					if inString or S~=","then
+						val = val .. S
+					elseif S == "," then
+						s.push(val)
+						val = ""
+					end
+				end
+			end
+			reg.push(s)
+		else
+			reg.push(v)
+		end
 	end
 end
 def_funcs = {}
