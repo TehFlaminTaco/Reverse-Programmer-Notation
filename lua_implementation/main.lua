@@ -12,7 +12,7 @@ input = io.open(arg[1]):read('*a')
 
 for k,v in ipairs(arg) do
 	if k > 1 then
-		if v:match("^{}$") then
+		if v:match("^{.*}$") then
 			local s = stack.new()
 			local inString = false
 			local val = ''
