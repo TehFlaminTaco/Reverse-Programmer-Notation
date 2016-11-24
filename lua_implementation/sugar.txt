@@ -12,7 +12,7 @@ _ floor			#
 L len			#
 b byte			#
 c char			#
-| split			#
+↔ split			# Alt+29
 ! not			#
 !! truthy		#
 ‼ truthy		# Alt+19

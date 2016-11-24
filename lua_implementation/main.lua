@@ -450,6 +450,11 @@ def_funcs['-0'] = function(_,_,f)
 	reg.push(str)
 	f['do']()
 end
+def_funcs['sort'] = function()
+	local a,b = reg.pop(),reg.pop().clone()
+	b.sort(a)
+	reg.push(b)
+end
 def_funcs['foreach'] = function(...)
 	local b, a = reg.pop(),reg.pop().clone()
 	while a.len()>0 do

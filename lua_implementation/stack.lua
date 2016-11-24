@@ -34,6 +34,9 @@ function stack.new(size,t)
 		end
 		return clone
 	end
+	function st.sort(f)
+		table.sort(holderT,f)
+	end
 	function st.hasValue(val)
 		for k,v in pairs(holderT) do
 			if v == val then
