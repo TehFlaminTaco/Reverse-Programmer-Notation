@@ -5,6 +5,13 @@ local unpack = unpack or table.unpack -- WHO DID THIS, WHO MADE UNPACK NON-GLOBA
 
 function stack.new(size,t)
 	size = size or -1
+	if (type(t)=='string' or type(t)=='number')then
+		local T = {}
+		for s in t:gmatch"." do
+			T[#T+1] = s
+		end
+		t = T
+	end
 	local holderT = t or {}
 	local st = {}
 	function st.push(...)

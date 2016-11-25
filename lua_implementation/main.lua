@@ -86,35 +86,15 @@ end
 def_funcs['.'] = function(_,_,f) 
 	local a = reg.pop()
 	if(type(a)=='table')then
-		local a = a.clone()
-		local val = a.pop()
-		local val2 = a.pop()
-		while val2 do
-			reg.push(val)
-			reg.push(val2)
-			f['.']()
-			val = reg.pop()
-			val2 = a.pop()
-		end
-		reg.push(val)
+		local a = stack.new(-1,a.inverse()) -- See below regarding use of inverse.
+		reg.push(table.concat(a.apply(table.pack)))
 	else
 		local b = reg.pop()
 		if type(b)=='table' then
-			local b = b.clone()
-			local val = b.pop()
-			local val2 = b.pop()
-			while val2 do
-				reg.push(val)
-				reg.push(a)
-				reg.push(val2)
-				f['.']()
-				f['.']()
-				val = reg.pop()
-				val2 = b.pop()
-			end
-			reg.push(val)
+			local b = stack.new(-1,b.inverse()) -- Using inverse instead of clone to maintain old functionality.
+			reg.push(table.concat(b.apply(table.pack),a))
 		else
-			reg.push(b..a)
+			reg.push(tostring(b)..tostring(a))
 		end
 	end
 end
@@ -385,16 +365,38 @@ def_funcs['delta'] = function()
 	if type(a)=='table' then
 		local nt = stack.new(a.size~=-1 and a.size-1) -- Pushes nil if a's size is negative 1, aka, infinite, which will intern make the new stack infinite. Otherwise, one slice smaller.
 		local a = a.clone()							  -- I still NEVER use the size. True as of 13/10/16 5:31 AEST
-		local z = a.pop()
+		local z = a.pop()							  -- Updated 25/11/16 2:39 AEST, size is still useless.
+		nt.push(z) -- Add the C value to the stack...
 		while a.len() > 0 do
 			local Z = a.pop()
-			nt.push(z - Z) -- Does polarity of the delta REALLLLY matter to you people? Probably.
+			nt.push(Z - z) -- Does polarity of the delta REALLLLY matter to you people? Probably. POLARITY DOES MATTER AND THIS WAS WRONG!!
 			z = Z
 		end
 		nt.invert()
 		reg.push(nt)
 	else -- Why are you doing this on a non-stack. Why do you hate me?
 		reg.push(a - reg.pop())
+	end
+end
+def_funcs['idelta'] = function()
+	local a = reg.pop()
+	local s = stack.new()
+	if(type(a)=='number')then
+		-- a is a our C value. Bad naming but sue me.
+		local n = a
+		s.push(n)
+		for k,v in ipairs(reg.pop().apply(table.pack)) do
+			n = n+v
+			s.push(n)
+		end
+		reg.push(s)
+	else
+		local n = 0
+		for k,v in ipairs(a.apply(table.pack)) do
+			n = n+v
+			s.push(n)
+		end
+		reg.push(s)
 	end
 end
 def_funcs['exit'] = function() return {i = math.huge} end
@@ -441,7 +443,7 @@ def_funcs['or'] = function()
 		end
 		reg.push('false')
 	else
-		return reg.pop() or a
+		reg.push(reg.pop() or a)
 	end
 end
 def_funcs['-0'] = function(_,_,f)
@@ -451,9 +453,27 @@ def_funcs['-0'] = function(_,_,f)
 	f['do']()
 end
 def_funcs['sort'] = function()
-	local a,b = reg.pop(),reg.pop().clone()
-	b.sort(a)
-	reg.push(b)
+	local a = reg.pop()
+	if(type(a)=='function')then
+		local b = reg.pop()
+		if type(b)=='string' then
+			local b = stack.new(-1,b)
+			b.sort(function(A,B)reg.push(A)reg.push(B)a()return reg.pop()end)
+			reg.push(table.concat(b.apply(table.pack)))
+		else
+			b.sort(function(A,B)reg.push(A)reg.push(B)a()return reg.pop()end)
+			reg.push(b)
+		end
+	else
+		if type(a)=='string' then
+			local a = stack.new(-1,a)
+			a.sort()
+			reg.push(table.concat(a.apply(table.pack)))
+		else
+			a.sort()
+			reg.push(a)
+		end
+	end
 end
 def_funcs['foreach'] = function(...)
 	local b, a = reg.pop(),reg.pop().clone()
@@ -889,8 +909,8 @@ function rpn(input, doEchoStack, upperLocal)
 			return function() reg.push(true) end
 		elseif key:lower()=='false' then
 			return function() reg.push(false) end
-		elseif key:match'^(...)'=="►" then
-			rpn(key:sub(key:find('►')+3):gsub(".-[\128-\191]*","%0 "):gsub("((['\"]).-%2)",function(s)return s:gsub('(.)%s','%1')end),false,funcs)
+		elseif key:match'^.'=="~" then
+			rpn(key:sub(key:find('~')+1):gsub(".-[\128-\191]*","%0 "):gsub("((['\"]).-%2)",function(s)return s:gsub('(.)%s','%1')end),false,funcs)
 		end
 	end})
 	local inString = false
@@ -898,7 +918,7 @@ function rpn(input, doEchoStack, upperLocal)
 	local builtWord = ''
 	local varType = ''
 	local function stuff(i,n)
-		if varType == 'String' and not (builtWord:match'^(...)'=="►") then
+		if varType == 'String' and not (builtWord:match'^.'=="~") then
 			reg.push(builtWord)
 		else
 			local f = funcs[builtWord]
@@ -927,7 +947,7 @@ function rpn(input, doEchoStack, upperLocal)
 	local n = 0
 	while i <= #input do
 		local s = input:sub(i,i)
-		if (s == '"' or s == "'") and not builtWord:match"^►" then
+		if (s == '"' or s == "'") and not builtWord:match"^~" then
 			if (s==usedQoute or not inString) then
 				usedQoute = s
 				inString = not inString

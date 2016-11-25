@@ -31,7 +31,7 @@ U upper			#
 po pop			#
 P push			#
 ? if			#
-¿ while			# Alt+0191
+¿ while			# Alt+168
 : for 			#
 º getraw		# Alt+167
 ¯ ceil			# Alt+0175
@@ -50,3 +50,6 @@ d delta			#
 ← rotate_l		# Alt+27
 ▬ to 			# Alt+22
 { function		#
+£ rep 			# Alt+156
+¢ sub			# Alt+189
+$ sort			# 
