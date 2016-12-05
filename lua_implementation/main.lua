@@ -794,6 +794,7 @@ function flow_to(i,inp,funcs)
 			end
 		end
 	end
+	return {i=#inp}
 end
 def_funcs['if'] = function(i,inp,funcs)
 	funcs['truthy'](i,inp) local case = reg.pop()
@@ -851,7 +852,7 @@ end
 def_funcs['function'] = function(i,inp,l)
 	local n = flow_to(i,inp,l).i
 	local f = function()
-		rpn(inp:sub(i+1,n-2),false,l)
+		rpn(inp:sub(i+1,n),false,l)
 	end
 	reg.push(f)
 	return {i = n}
