@@ -426,7 +426,16 @@ def_funcs['format'] = function()
 	end
 	reg.push(a:format(table.unpack(t)))
 end
-def_funcs['rep'] = function() local a,b = reg.pop(),reg.pop() reg.push(b:rep(a)) end
+def_funcs['rep'] = function()
+	local a,b = reg.pop(),reg.pop()
+	if(type(b)=='function')then
+		for i=1, a do
+			b()
+		end
+	else
+		reg.push(b:rep(a))
+	end
+end
 def_funcs['lower'] = function() reg.push(reg.pop():lower()) end
 def_funcs['upper'] = function() reg.push(reg.pop():upper()) end
 def_funcs['alphabet'] = function() reg.push('abcdefghijklmnopqrstuvwxyz') end
