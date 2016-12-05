@@ -409,8 +409,20 @@ def_funcs['format'] = function()
 	local a = reg.pop()
 	local c = ({a:gsub("%%[cdEefgGiouXxqs]","")})[2] -- The amount of arguments requested by the input string.
 	local t = {}
-	for i=1, c do
-		table.insert(t,1,reg.pop())
+	local i = 1
+	while i <= c do
+		local v = reg.pop()
+		if(type(v)=='table') then
+			for k2, v2 in ipairs(v:inverse()) do
+				table.insert(t,1,v2)
+				i = i + 1
+				if i > c then break end
+			end
+			i = i - 1
+		else
+			table.insert(t,1,v)
+		end
+		i = i + 1
 	end
 	reg.push(a:format(table.unpack(t)))
 end
@@ -436,7 +448,7 @@ def_funcs['and'] = function()
 		end
 		reg.push(v)
 	else
-		return reg.pop() and a
+		reg.push(reg.pop() and a)
 	end
 end
 def_funcs['or'] = function()
@@ -929,7 +941,7 @@ function rpn(input, doEchoStack, upperLocal)
 	local builtWord = ''
 	local varType = ''
 	local function stuff(i,n)
-		if varType == 'String' and not (builtWord:match'^.'=="~") then
+		if varType == 'String' and not (builtWord:match'^~') then
 			reg.push(builtWord)
 		else
 			local f = funcs[builtWord]
