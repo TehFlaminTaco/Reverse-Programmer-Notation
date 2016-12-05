@@ -1,4 +1,5 @@
-﻿B base			#
+﻿SUGAR, Defined by: ShortName LongName GarbageComments. The shortname isn't neccesarily shorter.
+B base			#
 -B frombase		#
 r reg			#
 R replace		#
@@ -57,3 +58,5 @@ $ sort			#
 f find			#
 F format		# 
 @ local			#
+m rep 			#
+C call 			#

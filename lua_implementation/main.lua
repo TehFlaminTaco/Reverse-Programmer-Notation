@@ -353,6 +353,7 @@ def_funcs['ceil'] = function()
 end
 def_funcs['sub'] = function() local a,b,c = reg.pop(),reg.pop(),reg.pop() reg.push(c:sub(b,a)) end
 def_funcs['do'] = function(x,y,z,w,r) local a = reg.pop() if type(a)=='string' then rpn(a,false,z) else a(x,y,z,w,r) end end
+def_funcs['call'] = function(A,B,funcs,...) local a = reg.pop() if type(a)=='function' then a() else return funcs[tostring(a)] and funcs[tostring(a)](A,B,funcs,...) end end
 def_funcs['stack'] = function() reg.push(stack.new()) end
 def_funcs['not'] = function(_,_,f) f['truthy']() reg.push(not reg.pop()) end
 def_funcs['reg'] = function() reg.push(reg) end
