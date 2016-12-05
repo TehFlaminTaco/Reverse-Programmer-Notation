@@ -405,6 +405,15 @@ def_funcs['flow'] = function() reg.push(flow) end
 def_funcs['local'] = function(i,inp,f,l) reg.push(l) end
 def_funcs['read'] = function() reg.push(io.read()) end
 def_funcs['find'] = function() local a,b = reg.pop(),reg.pop() reg.push(b:find(a)) end
+def_funcs['format'] = function()
+	local a = reg.pop()
+	local c = ({a:gsub("%%[cdEefgGiouXxqs]","")})[2] -- The amount of arguments requested by the input string.
+	local t = {}
+	for i=1, c do
+		table.insert(t,1,reg.pop())
+	end
+	reg.push(a:format(table.unpack(t)))
+end
 def_funcs['rep'] = function() local a,b = reg.pop(),reg.pop() reg.push(b:rep(a)) end
 def_funcs['lower'] = function() reg.push(reg.pop():lower()) end
 def_funcs['upper'] = function() reg.push(reg.pop():upper()) end

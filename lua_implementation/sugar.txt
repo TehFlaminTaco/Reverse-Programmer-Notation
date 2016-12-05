@@ -53,3 +53,5 @@ d delta			#
 £ rep 			# Alt+156
 ¢ sub			# Alt+189
 $ sort			# 
+f find			#
+F format		# 
