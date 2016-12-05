@@ -1,5 +1,4 @@
 local stack = {}
-local meta = {}
 
 local unpack = unpack or table.unpack -- WHO DID THIS, WHO MADE UNPACK NON-GLOBAL RANDOMLY?
 
@@ -14,6 +13,7 @@ function stack.new(size,t)
 	end
 	local holderT = t or {}
 	local st = {}
+	local meta = {}
 	function st.push(...)
 		local a = {...}
 		for k,val in pairs(a) do
@@ -84,8 +84,19 @@ function stack.new(size,t)
 	function st.apply(f) -- IT WAS JAVASCRIPT'S IDEA IS SWEAR!
 		return f(unpack(holderT))
 	end
+
+	function meta.__tostring(t)
+		local s = "["
+		local conj = ""
+		for k,v in ipairs(t.apply(table.pack)) do
+			s = s .. conj .. tostring(v)
+			conj = ", "
+		end
+		return s.."]"
+	end
+
 	st.size = size
-	return st
+	return setmetatable(st,meta)
 end
 
 return stack

@@ -255,7 +255,7 @@ end
 def_funcs['getraw'] = function(_,_,funcs) reg.push(funcs[reg.pop()]) end
 def_funcs['shuffle'] = function() reg.peek().shuffle() end
 def_funcs['Q'] = function(i,inp) reg.push(inp) end
-def_funcs['asoc'] = function() local a = reg.pop() if type(a)=='table' then a[reg.pop()] = reg.pop() else mem[a] = reg.pop() end end
+def_funcs['asoc'] = function() local a = reg.pop() if type(a)=='table' then a[tostring(reg.pop())] = reg.pop() else mem[tostring(a)] = reg.pop() end end
 def_funcs['recall'] = function() reg.push(mem[reg.pop()]) end
 def_funcs['char'] = function()
 	local a = reg.pop()
