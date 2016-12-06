@@ -86,13 +86,17 @@ function stack.new(size,t)
 	end
 
 	function meta.__tostring(t)
-		local s = "["
+		local s = "("
 		local conj = ""
 		for k,v in ipairs(t.apply(table.pack)) do
-			s = s .. conj .. tostring(v)
-			conj = ", "
+			local S = tostring(v)
+			if(type(v)=='string')then
+				S = '"'..S..'"' -- I'll auto escape this later. For now, I've made my hole.
+			end
+			s = s .. conj .. S
+			conj = " "
 		end
-		return s.."]"
+		return s..")"
 	end
 
 	st.size = size
