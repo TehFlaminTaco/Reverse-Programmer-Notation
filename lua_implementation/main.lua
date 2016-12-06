@@ -38,6 +38,25 @@ for k,v in ipairs(arg) do
 		end
 	end
 end
+
+local stringmeta = getmetatable("")
+local funcmeta = {}
+debug.setmetatable(function()end, funcmeta)
+
+function stringmeta.__mul(a,b)
+	if(type(a)=='string')then return a:rep(b) end
+	if(type(b)=='string')then return b:rep(a) end
+end
+
+function funcmeta.__mul(a,b)
+	if(type(a)=='function')then return function(...) for i=1,b do a(...) end end end
+	if(type(b)=='function')then return function(...) for i=1,a do b(...) end end end
+end
+
+function funcmeta.__concat(a,b)
+	return function(...) a(...) b(...) end
+end
+
 def_funcs = {}
 def_funcs['+'] = function(...)
 	local a, b = reg.pop(), reg.pop()
@@ -136,22 +155,20 @@ def_funcs['*'] = function()
 		local b = b.clone()
 		b.replace_all(function(z) return z*a end)
 		reg.push(b)
-	else
-		if(type(a)=='table')then
-			reg.push(b)
-			local a = a.clone()
-			local n = 1
-			while a.len()>0 do
-				local z = a.pop()
-				if type(z)=='boolean' then
-					z = z and 1 or 0
-				end
-				n = n * z
+	elseif(type(a)=='table')then
+		reg.push(b)
+		local a = a.clone()
+		local n = 1
+		while a.len()>0 do
+			local z = a.pop()
+			if type(z)=='boolean' then
+				z = z and 1 or 0
 			end
-			reg.push(n)
-		else
-			reg.push(b*a)
+			n = n * z
 		end
+		reg.push(n)
+	else
+		reg.push(b*a)
 	end
 end
 def_funcs['/'] = function()
@@ -353,7 +370,7 @@ def_funcs['ceil'] = function()
 end
 def_funcs['sub'] = function() local a,b,c = reg.pop(),reg.pop(),reg.pop() reg.push(c:sub(b,a)) end
 def_funcs['do'] = function(x,y,z,w,r) local a = reg.pop() if type(a)=='string' then rpn(a,false,z) else a(x,y,z,w,r) end end
-def_funcs['call'] = function(A,B,funcs,...) local a = reg.pop() if type(a)=='function' then a() else return funcs[tostring(a)] and funcs[tostring(a)](A,B,funcs,...) end end
+def_funcs['call'] = function(A,B,funcs,...) local a = reg.pop() if type(a)=='function' then a() else reg.push(a) def_funcs['do'](A,B,funcs,...) end end
 def_funcs['stack'] = function() reg.push(stack.new()) end
 def_funcs['not'] = function(_,_,f) f['truthy']() reg.push(not reg.pop()) end
 def_funcs['reg'] = function() reg.push(reg) end
@@ -363,11 +380,15 @@ def_funcs['peek'] = function() reg.push(reg.pop().peek()) end
 def_funcs['hasvalue'] = function() local a,b = reg.pop(),reg.pop() reg.push(b.hasValue(a)) end
 def_funcs['delta'] = function()
 	local a = reg.pop()
+	if(type(a))=='string'then
+		a = stack.new(-1,a)
+		a.replace_all(string.byte)
+	end
 	if type(a)=='table' then
 		local nt = stack.new(a.size~=-1 and a.size-1) -- Pushes nil if a's size is negative 1, aka, infinite, which will intern make the new stack infinite. Otherwise, one slice smaller.
 		local a = a.clone()							  -- I still NEVER use the size. True as of 13/10/16 5:31 AEST
 		local z = a.pop()							  -- Updated 25/11/16 2:39 AEST, size is still useless.
-		nt.push(z) -- Add the C value to the stack...
+		nt.push(z) -- Add the C value to the stack... -- Updated 06/12/16 3:55 AEST, Still useless. Maybe someday.
 		while a.len() > 0 do
 			local Z = a.pop()
 			nt.push(Z - z) -- Does polarity of the delta REALLLLY matter to you people? Probably. POLARITY DOES MATTER AND THIS WAS WRONG!!
@@ -386,14 +407,14 @@ def_funcs['idelta'] = function()
 		-- a is a our C value. Bad naming but sue me.
 		local n = a
 		s.push(n)
-		for k,v in ipairs(reg.pop().apply(table.pack)) do
+		for k,v in ipairs(reg.pop().inverse()) do
 			n = n+v
 			s.push(n)
 		end
 		reg.push(s)
 	else
 		local n = 0
-		for k,v in ipairs(a.apply(table.pack)) do
+		for k,v in ipairs(a.inverse()) do
 			n = n+v
 			s.push(n)
 		end
@@ -904,12 +925,13 @@ def_funcs['else'] = function(i,inp,funcs)
 	return t
 end
 def_funcs['debug'] = function(i,inp)
-	local newStack = reg.clone()
-	local str = ""
-	while newStack.len() > 0 do
-		str = str .. "\""..tostring(newStack.pop()).."\"" .. ", "
+	print("CURRENT REG: ",reg)
+	local a = true
+	for k,v in pairs(mem) do
+		a = a and print("CUSTOM MEMORY:")
+		print(k, '=', v)
 	end
-	print(str)
+
 end
 
 flow = stack.new()
