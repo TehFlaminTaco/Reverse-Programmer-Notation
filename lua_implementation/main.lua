@@ -358,7 +358,7 @@ def_funcs['stack'] = function() reg.push(stack.new()) end
 def_funcs['not'] = function(_,_,f) f['truthy']() reg.push(not reg.pop()) end
 def_funcs['reg'] = function() reg.push(reg) end
 def_funcs['push'] = function() local a,b = reg.pop(),reg.pop() b.push(a)reg.push(b)end
-def_funcs['pop'] = function() local a = reg.pop()reg.push(a.pop()) reg.push(a)end
+def_funcs['pop'] = function() local a = reg.peek()reg.push(a.pop())end
 def_funcs['peek'] = function() reg.push(reg.pop().peek()) end
 def_funcs['hasvalue'] = function() local a,b = reg.pop(),reg.pop() reg.push(b.hasValue(a)) end
 def_funcs['delta'] = function()
@@ -504,6 +504,21 @@ def_funcs['sort'] = function()
 			a.sort()
 			reg.push(a)
 		end
+	end
+end
+def_funcs['dups'] = function()
+	local a = reg.pop()
+	if(type(a)=='string')then
+		local s = ""
+		for S in a:gmatch'.' do
+			if not s:find(S) then s = s .. S end
+		end
+		reg.push(s)
+	else
+		local s=stack.new()
+		local b = {}
+		a.apply(function(...)for k,v in pairs({...}) do if not b[v] then s.push(v) b[v] = true end end end)
+		reg.push(s)
 	end
 end
 def_funcs['foreach'] = function(...)
