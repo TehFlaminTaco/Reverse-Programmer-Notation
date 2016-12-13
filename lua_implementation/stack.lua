@@ -86,7 +86,7 @@ function stack.new(size,t)
 	end
 
 	function meta.__tostring(t)
-		local s = "("
+		local s = "( "
 		local conj = ""
 		for k,v in ipairs(t.apply(table.pack)) do
 			local S = tostring(v)
@@ -96,7 +96,7 @@ function stack.new(size,t)
 			s = s .. conj .. S
 			conj = " "
 		end
-		return s..")"
+		return s.." )"
 	end
 
 	st.size = size

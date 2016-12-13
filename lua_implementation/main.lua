@@ -123,6 +123,16 @@ def_funcs['z'] = function() reg.push('z') end
 def_funcs['X'] = function() reg.push('X') end
 def_funcs['Y'] = function() reg.push('Y') end
 def_funcs['Z'] = function() reg.push('Z') end
+local tempRegStacks = stack.new();
+def_funcs['('] = function()
+	tempRegStacks.push(reg);
+	reg = stack.new();
+end
+def_funcs[')'] = function()
+	local r = tempRegStacks.pop();
+	r.push(reg);
+	reg = r;
+end
 def_funcs['-'] = function()
 	local a,b = reg.pop(),reg.pop()
 	if type(a)=='boolean' then
@@ -1018,7 +1028,7 @@ function rpn(input, doEchoStack, upperLocal)
 	local n = 0
 	while i <= #input do
 		local s = input:sub(i,i)
-		if (s == '"' or s == "'") and not builtWord:match"^~" then
+		if (s == '"' or s == "'") then
 			if (s==usedQoute or not inString) then
 				usedQoute = s
 				inString = not inString
