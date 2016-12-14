@@ -17,4 +17,4 @@ Strings are the only things that do not follow this rule, instead, when the inte
 # Note
 
 The majority of this Readme was horrifyingly out of date, and although is all technically true, holds some bad practices and information.
-Instead, if you want to see a list of Functions, check out [HERE](https://tehflamintaco.github.io/Reverse-Programmer-Notation/CommandList.html)
+Instead, if you want to see a list of Functions, check out [HERE](https://tehflamintaco.github.io/Reverse-Programmer-Notation/CommandTable.html)
