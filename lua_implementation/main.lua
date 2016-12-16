@@ -1033,6 +1033,9 @@ function rpn(input, doEchoStack, upperLocal)
 				usedQoute = s
 				inString = not inString
 				varType = 'String'
+				if builtWord:find("^~") then
+					builtWord = builtWord .. s
+				end
 			else
 				builtWord = builtWord..s
 			end
