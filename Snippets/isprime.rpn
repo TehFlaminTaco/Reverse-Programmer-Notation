@@ -1,0 +1,17 @@
+
+"Ungolfed Version" [
+
+function
+	`input local =
+	0 'isaprime' local =
+	1 input sqrt 2 for
+		input \ %
+		0 ==
+		isaprime or 'isaprime' local =
+	end
+	1 isaprime -
+end `isprime =
+
+"Golfed Version" [
+
+~{`x@=0`y@=1x'sqrt'C2:x\%0Ey|`y@=}1y-} `isprime =

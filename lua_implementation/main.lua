@@ -1048,8 +1048,9 @@ function rpn(input, doEchoStack, upperLocal)
 	if doEchoStack then
 		local val = reg.pop()
 		while val~=nil do
-			print(val)
+			io.write(val)
 			val = reg.pop()
+			if val then print() end
 		end
 	end
 end

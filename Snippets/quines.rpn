@@ -1,0 +1,14 @@
+Q "Boring quine, Q just refers to the source currently being compiled. Technically cheating, too." [
+
+1
+"Although not technically a constants quine, due to the fact that 1 is a function, a 1 followed by a newline is usually considered a cheating quine." [
+
+1
+1
+"Two ones however, due to the nature of RProgN printing the reg stack backwards, is not cheating. Each one prints the other one." [
+
+"%q ] F" ] F "This one is a real quine. %q is the formatting thingy for 'the string in qoutes', the ] F duplicates the string, and formats it with itself. Yay." [
+
+IiIgXSBkZWNvZGU2NCAu"" ] decode64 . "The Base64 quine works really well for RProgN, because the quotes can be tacted onto the end. Just duplicates the base64 string, decodes the front one and sticks them together" [
+
+"There's probably a few more of these, but this is a nice array of quines for you to play with." [
