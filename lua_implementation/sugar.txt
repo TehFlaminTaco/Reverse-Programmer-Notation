@@ -60,3 +60,8 @@ F format		#
 @ local			#
 m rep 			#
 C call 			#
+o log 			#
+M match			#
+D sin			#
+G cos 			#
+H tan			#

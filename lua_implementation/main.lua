@@ -794,6 +794,38 @@ def_funcs['truthy'] = function()
 	end
 	reg.push(case)
 end
+
+def_funcs['log'] = function()
+	local a,b = reg.pop(),reg.pop() reg.push(math.log(b,a))
+end
+def_funcs['sin'] = function()
+	reg.push(math.sin(reg.pop()))
+end
+def_funcs['cos'] = function()
+	reg.push(math.cos(reg.pop()))
+end
+def_funcs['tan'] = function()
+	reg.push(math.tan(reg.pop()))
+end
+def_funcs['asin'] = function()
+	reg.push(math.asin(reg.pop()))
+end
+def_funcs['acos'] = function()
+	reg.push(math.acos(reg.pop()))
+end
+def_funcs['atan'] = function()
+	reg.push(math.atan(reg.pop()))
+end
+def_funcs['atan2'] = function()
+	local a,b = reg.pop(),reg.pop() reg.push(math.atan2(b,a))
+end
+def_funcs['deg'] = function()
+	reg.push(math.deg(reg.pop()))
+end
+def_funcs['rad'] = function()
+	reg.push(math.rad(reg.pop()))
+end
+
 function flow_to(i,inp,funcs)
 	local t = {}
 	local inStr = false
@@ -1051,7 +1083,7 @@ function rpn(input, doEchoStack, upperLocal)
 	if doEchoStack then
 		local val = reg.pop()
 		while val~=nil do
-			io.write(val)
+			io.write(tostring(val))
 			val = reg.pop()
 			if val then print() end
 		end
