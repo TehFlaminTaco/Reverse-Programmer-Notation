@@ -58,6 +58,18 @@ function funcmeta.__concat(a,b)
 end
 
 def_funcs = {}
+
+function wrapFunc(func,n)
+	local n = n or 1
+	return function()
+		local vals = stack.new()
+		for i=1, n do
+			vals.push(reg.pop())
+		end
+		reg.push(vals.apply(func))
+	end
+end
+
 def_funcs['+'] = function(...)
 	local a, b = reg.pop(), reg.pop()
 	if type(a)=='boolean' then
@@ -141,6 +153,17 @@ def_funcs['-'] = function()
 	if type(b)=='boolean' then
 		b = b and 1 or 0
 	end
+	if(type(b)=='table' and type(a)=='table')then
+		local a = a.clone()
+		local b = b.clone()
+		local s = stack.new()
+		while math.min(a.len(), b.len())>0 do
+			local A,B = a.pop(), b.pop()
+			s.push(A-B)
+		end
+		reg.push(s)
+		return
+	end
 	if type(b)=='table' then
 		local b = b.clone()
 		b.replace_all(function(z) return z-a end)
@@ -161,11 +184,7 @@ def_funcs['*'] = function()
 	if type(b)=='boolean' then
 		b = b and 1 or 0
 	end
-	if type(b)=='table' then
-		local b = b.clone()
-		b.replace_all(function(z) return z*a end)
-		reg.push(b)
-	elseif(type(a)=='table')then
+	if type(a)=='table' then
 		reg.push(b)
 		local a = a.clone()
 		local n = 1
@@ -177,6 +196,10 @@ def_funcs['*'] = function()
 			n = n * z
 		end
 		reg.push(n)
+	elseif(type(b)=='table')then
+		local b = b.clone()
+		b.replace_all(function(z) return z*a end)
+		reg.push(b)
 	else
 		reg.push(b*a)
 	end
@@ -281,6 +304,7 @@ def_funcs['to'] = function()
 end
 def_funcs['getraw'] = function(_,_,funcs) reg.push(funcs[reg.pop()]) end
 def_funcs['shuffle'] = function() reg.peek().shuffle() end
+def_funcs['clone'] = function() reg.push(reg.peek().clone()) end
 def_funcs['Q'] = function(i,inp) reg.push(inp) end
 def_funcs['asoc'] = function() local a = reg.pop() if type(a)=='table' then a[tostring(reg.pop())] = reg.pop() else mem[tostring(a)] = reg.pop() end end
 def_funcs['recall'] = function() reg.push(mem[reg.pop()]) end
@@ -399,7 +423,7 @@ def_funcs['delta'] = function()
 		local a = a.clone()							  -- I still NEVER use the size. True as of 13/10/16 5:31 AEST
 		local z = a.pop()							  -- Updated 25/11/16 2:39 AEST, size is still useless.
 		nt.push(z) -- Add the C value to the stack... -- Updated 06/12/16 3:55 AEST, Still useless. Maybe someday.
-		while a.len() > 0 do
+		while a.len() > 0 do 						  -- Updated 20/12/16 5:22 AEST, how time flies. Still useless.
 			local Z = a.pop()
 			nt.push(Z - z) -- Does polarity of the delta REALLLLY matter to you people? Probably. POLARITY DOES MATTER AND THIS WAS WRONG!!
 			z = Z
@@ -783,8 +807,8 @@ def_funcs['set'] = function()
 	local a, b, c = reg.pop(),reg.pop(),reg.pop()
 	c[b] = a
 end
-def_funcs['truthy'] = function()
-	local case = reg.pop()
+function truthy(val)
+	local case = val
 	if(type(case)=='number')then
 		case = case ~= 0
 	elseif type(case)=='string' then
@@ -792,8 +816,9 @@ def_funcs['truthy'] = function()
 	else
 		case = not not case
 	end
-	reg.push(case)
+	return case	
 end
+def_funcs['truthy'] = wrapFunc(truthy)
 
 def_funcs['log'] = function()
 	local a,b = reg.pop(),reg.pop() reg.push(math.log(b,a))
@@ -873,6 +898,41 @@ function flow_to(i,inp,funcs)
 		end
 	end
 	return {i=#inp}
+end
+def_funcs['?'] = function()
+	local case, if_true, if_false
+	local funcs = {}
+	while true do
+		local v = reg.pop()
+		if(type(v)=='function')then
+			table.insert(funcs,1,v)
+		else
+			case = v
+			break
+		end
+	end
+	case = truthy(case)
+	if case then
+		if funcs[1] then funcs[1]() end
+	else
+		if funcs[2] then funcs[2]() end
+	end
+end
+def_funcs[":"] = function()
+	local func = reg.pop()
+	local inc = reg.pop()
+	local max = reg.pop()
+	local min = reg.pop()
+	for i=min, max, inc do
+		reg.push(i)
+		func()
+	end
+end
+def_funcs[";"] = function()
+	local func = reg.pop()
+	while truthy(reg.pop()) do
+		func()
+	end
 end
 def_funcs['if'] = function(i,inp,funcs)
 	funcs['truthy'](i,inp) local case = reg.pop()
@@ -976,6 +1036,7 @@ def_funcs['debug'] = function(i,inp)
 
 end
 
+-- Most of this is now Redundant. Yay!
 flow = stack.new()
 flow.push(def_funcs['if'])
 flow.push(def_funcs['if_peek'])
