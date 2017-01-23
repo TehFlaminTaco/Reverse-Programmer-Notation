@@ -1,3 +1,10 @@
+if arg[0] then
+	function require(lib)
+		local dir = arg[0]:gsub("main.lua$","")
+		return loadfile(dir..lib)()
+	end
+end
+
 stack=require'stack'
 
 math.randomseed(os.time())
