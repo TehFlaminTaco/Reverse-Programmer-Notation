@@ -1,7 +1,7 @@
 if arg[0] then
+	local dir = arg[0]:gsub("main.lua$","")
 	function require(lib)
-		local dir = arg[0]:gsub("main.lua$","")
-		return loadfile(dir..lib)()
+		return loadfile(dir..lib..".lua")()
 	end
 end
 
@@ -1042,6 +1042,25 @@ def_funcs['debug'] = function(i,inp)
 	end
 
 end
+def_funcs['T'] = function()
+	reg.push([[
+  ___.
+ //  \\
+((   ''
+ \\__,
+/6 (%)\,
+(__/:";,;\--____----_
+;; :';,:';`;,';,;';`,`_
+  ;:,;;';';,;':,';';,-Y\
+   ;,;,;';';,;':;';'; Z/
+   / ;,';';,;';,;';;'
+  / / |';/~~~~~\';;'
+ ( K  | |      || |
+  \_\ | |      || |
+   \Z | |      || |
+      L_|      LL_|
+      LW/      LLW/]])
+end
 
 -- Most of this is now Redundant. Yay!
 flow = stack.new()
@@ -1052,11 +1071,8 @@ flow.push(def_funcs['while'])
 flow.push(def_funcs['while_peek'])
 flow.push(def_funcs['function'])
 
--- START SUGAR LOAD
 local sugar = io.open('sugar.txt')
-sugar = sugar:read('*a')
--- END SUGAR LOAD
-for str in sugar:gmatch"[^\r\n]*" do
+for str in sugar:lines() do
 	local a,b = str:match("(%S+)%s+(%S+)")
 	if a and b and def_funcs[b] then
 		def_funcs[a] = def_funcs[b]
