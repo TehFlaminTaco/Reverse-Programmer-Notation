@@ -55,6 +55,12 @@ function stringmeta.__mul(a,b)
 	if(type(b)=='string')then return b:rep(a) end
 end
 
+function stringmeta.__sub(a,b)
+	if(type(a)=='string'and type(b)=='string')then
+		return a:gsub(b,'')
+	end
+end
+
 function funcmeta.__mul(a,b)
 	if(type(a)=='function')then return function(...) for i=1,b do a(...) end end end
 	if(type(b)=='function')then return function(...) for i=1,a do b(...) end end end
