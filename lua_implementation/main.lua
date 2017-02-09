@@ -495,9 +495,13 @@ def_funcs['factors'] = function()
 			if not factors.hasValue(i) then
 				factors.push(i)
 			end
+			if not factors.hasValue(math.floor(n/i)) then
+				factors.push(math.floor(n/i))
+			end
 		end
 	end
 	factors.push(n)
+	factors.sort()
 	reg.push(factors)
 end
 def_funcs['primacy'] = function()
