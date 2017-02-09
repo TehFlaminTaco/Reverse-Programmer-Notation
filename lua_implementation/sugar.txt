@@ -63,3 +63,8 @@ M match			#
 D sin			#
 G cos 			#
 H tan			#
+q sub			#
+j sqrt			#
+V index			#
+k factors		#
+v primacy		#

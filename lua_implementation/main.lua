@@ -426,6 +426,14 @@ def_funcs['ceil'] = function()
 	end
 end
 def_funcs['sub'] = function() local a,b,c = reg.pop(),reg.pop(),reg.pop() reg.push(c:sub(b,a)) end
+def_funcs['index'] = function()
+	local b, a = reg.pop(),reg.pop()
+	if type(a) == 'string' then
+		reg.push(a:sub(b,b))
+	elseif type(a) == 'stack' then
+		reg.push(a.index(b))
+	end
+end
 def_funcs['do'] = function(x,y,z,w,r) local a = reg.pop() if type(a)=='string' then rpn(a,false,z) else a(x,y,z,w,r) end end
 def_funcs['call'] = function(A,B,funcs,...) local a = reg.pop() if type(a)=='function' then a() else reg.push(a) def_funcs['do'](A,B,funcs,...) end end
 def_funcs['stack'] = function() reg.push(stack.new()) end
@@ -477,6 +485,25 @@ def_funcs['idelta'] = function()
 		end
 		reg.push(s)
 	end
+end
+def_funcs['factors'] = function()
+	local n = reg.pop()
+	local factors = stack.new()
+	factors.push(1)
+	for i=2, math.sqrt(n) do
+		if n % i == 0 then
+			if not factors.hasValue(i) then
+				factors.push(i)
+			end
+		end
+	end
+	factors.push(n)
+	reg.push(factors)
+end
+def_funcs['primacy'] = function()
+	def_funcs.factors()
+	local t = reg.pop()
+	reg.push(t.len()<=2)
 end
 def_funcs['exit'] = function() return {i = math.huge} end
 def_funcs['mem'] = function() reg.push(mem) end
@@ -1095,6 +1122,14 @@ for str in sugar:lines() do
 	end
 end
 
+--[[ Debug Function, print all currently unused characters.
+for i=32, 127 do
+	if not def_funcs[string.char(i)] then
+		io.write(string.char(i))
+	end
+end
+print()
+--]]
 function rpn(input, doEchoStack, upperLocal)
 	local locals = setmetatable({},{__index = upperLocal})
 	local funcs = setmetatable({}, {__index = function(t, key)

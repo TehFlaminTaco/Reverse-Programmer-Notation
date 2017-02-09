@@ -41,6 +41,9 @@ function stack.new(size,t)
 		end
 		return clone
 	end
+	function st.index(n)
+		return holderT[n]
+	end
 	function st.sort(f)
 		table.sort(holderT,f)
 	end

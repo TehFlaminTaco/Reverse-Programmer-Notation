@@ -42,7 +42,7 @@
  <tr><td class="command">!=</td><td>Compare the second topmost item of the reg stack with the top.</td></tr>
  <tr><td class="command">></td><td>Compare the second topmost item of the reg stack with the top.</td></tr>
  <tr><td class="command">>=</td><td>Compare the second topmost item of the reg stack with the top.</td></tr>
- <tr><td class="command">and ("&")</td><td>Compare the second topmost item of the reg stack with the top.</td></tr>
+ <tr><td class="command">and ("&amp;")</td><td>Compare the second topmost item of the reg stack with the top.</td></tr>
  <tr><td class="command">or ("|")</td><td>Compare the second topmost item of the reg stack with the top.</td></tr>
  <tr><td class="command">not ("!")</td><td>If the top of the stack is truth, push false. True otherwise.</td></tr>
  <tr><td class="command">truthy ("!!", "‼")</td><td>if the top value is truthy, push true, Otherwise, push false.</td></tr>
@@ -94,6 +94,7 @@
  <tr><td class="command">mem</td><td>Pushes the 'mem' stack to the stack. This is technically an associative array, containing all assigned global variables.</td></tr>
  <tr><td class="command">flow</td><td>Pushes the flow of control stack, used by 'end' for flow of control. Hard to use.</td></tr>
  <tr><td class="command">local ("⌂","@")</td><td>Returns a local asoc array. Values can be asoc'd to this, and they can then be called the same way as they would from the mem stack, but works sepereately for sub-functions.</td></tr>
+ <tr><td class="command">T</td><td>Goat.</td></tr>
  <tr><td class="command">&nbsp;</td><td>&nbsp;</td></tr>
  <tr><td class="header">*General Functions*</td><td>&nbsp;</td></tr>
  <tr><td class="command">frombase ("-B")</td><td>Convert the second topmost value from the base on top of the stack to an integer.</td></tr>
@@ -129,9 +130,10 @@
  <tr><td class="command">set</td><td>Redundant, sets the value of k to v of stack t where t is the third topmost value, k is the second and v is the first.</td></tr>
  <tr><td class="command">shuffle</td><td>Randomise the stack on top. Please avoid doing 'reg shuffle'</td></tr>
  <tr><td class="command">split ("↔")</td><td>Split the second topmost string, grouping by the first pattern.</td></tr>
- <tr><td class="command">sqrt</td><td>Push the square root of the top of the stack.</td></tr>
+ <tr><td class="command">sqrt ("j")</td><td>Push the square root of the top of the stack.</td></tr>
  <tr><td class="command">stack ("s")</td><td>Push a new empty stack.</td></tr>
- <tr><td class="command">sub ("¢")</td><td>Get the substring of the third top most value of the stack between the second and first indexes, 1 indexed.</td></tr>
+ <tr><td class="command">sub ("¢", "q")</td><td>Get the substring of the third top most value of the stack between the second and first indexes, 1 indexed.</td></tr>
+ <tr><td class="command">index ("V")</td><td>Push the top of the stack'th value of the value under the top.</td></tr>
  <tr><td class="command">sum ("++", "‡")</td><td>Same functionality as '+'.</td></tr>
  <tr><td class="command">to ("▬")</td><td>Push a stack from the second topmost value to the first. Works for strings and numbbers.</td></tr>
  <tr><td class="command">tostack ("S")</td><td>Convert the top of the stack to a stack of characters</td></tr>
@@ -151,4 +153,6 @@
  <tr><td class="command">log ("o")</td><td>Pushes the log of the top two values of the stack.</td></tr>
  <tr><td class="command">deg</td><td>Convert the top of the stack to degrees from radians.</td></tr>
  <tr><td class="command">rad</td><td>Convert the top of the stack from degrees to radians.</td></tr>
+ <tr><td class="command">factors ("k")</td><td>Push a stack containing all the unique factors of the top of the stack.</td></tr>
+ <tr><td class="command">primacy ("v")</td><td>Push true if the top of the stack is prime, false otherwise.</td></tr>
 </tbody></table>
