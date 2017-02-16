@@ -1219,7 +1219,7 @@ def_funcs['debug'] = function(i,inp)
 	end
 
 end
-def_funcs['T'] = function()
+def_funcs['goat'] = function()
 	reg.push([[
   ___.
  //  \\
@@ -1248,12 +1248,6 @@ flow.push(def_funcs['while'])
 flow.push(def_funcs['while_peek'])
 flow.push(def_funcs['function'])
 
-local funcNames = {}
-
-for k,v in pairs(def_funcs) do
-	funcNames[v] = k
-end
-
 local sugar = io.open('sugar.txt')
 for str in sugar:lines() do
 	local a,b = str:match("(%S+)%s+(%S+)")
@@ -1262,22 +1256,7 @@ for str in sugar:lines() do
 	end
 end
 
-local funcsWithShorts = {}
-
-for k,v in pairs(def_funcs) do
-	if #k <= 1 then
-		funcsWithShorts[v] = true
-	end
-end
-
-for k,v in pairs(funcNames) do
-	if not funcsWithShorts[k] then
-		print(v)
-	end
-end
-print("--------------")
-
----[[ Debug Function, print all currently unused characters.
+--[[ Debug Function, print all currently unused characters.
 local special = {}
 special['~'] = true
 special['`'] = true
