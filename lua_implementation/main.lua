@@ -91,6 +91,19 @@ def_funcs['+'] = function(...)
 	if type(b)=='boolean' then
 		b = b and 1 or 0
 	end
+
+	if (type(a)=="table" and type(b)=="table" and #a==#b)then
+		local n = stack.new()
+		local A = a.clone().invert()
+		local B = b.clone().invert()
+		while #A > 0 do
+			local a = A.pop()
+			local b = B.pop()
+			n.push(a+b)
+		end
+		reg.push(n)
+		return
+	end
 	
 	if(type(b)=="table")then
 		b.replace_all(function(x) return x + a end)
@@ -197,6 +210,18 @@ def_funcs['*'] = function()
 	if type(b)=='boolean' then
 		b = b and 1 or 0
 	end
+	if (type(a)=="table" and type(b)=="table" and #a==#b)then
+		local n = stack.new()
+		local A = a.clone().invert()
+		local B = b.clone().invert()
+		while #A > 0 do
+			local a = A.pop()
+			local b = B.pop()
+			n.push(a*b)
+		end
+		reg.push(n)
+		return
+	end
 	if type(a)=='table' then
 		reg.push(b)
 		local a = a.clone()
@@ -225,6 +250,18 @@ def_funcs['/'] = function()
 	if type(b)=='boolean' then
 		b = b and 1 or 0
 	end
+	if (type(a)=="table" and type(b)=="table" and #a==#b)then
+		local n = stack.new()
+		local A = a.clone().invert()
+		local B = b.clone().invert()
+		while #A > 0 do
+			local a = A.pop()
+			local b = B.pop()
+			n.push(b/a)
+		end
+		reg.push(n)
+		return
+	end
 	if type(b)=='table' then
 		local b = b.clone()
 		b.replace_all(function(z) return z/a end)
@@ -245,6 +282,20 @@ def_funcs['//'] = function()
 	if type(b)=='boolean' then
 		b = b and 1 or 0
 	end
+
+	if (type(a)=="table" and type(b)=="table" and #a==#b)then
+		local n = stack.new()
+		local A = a.clone().invert()
+		local B = b.clone().invert()
+		while #A > 0 do
+			local a = A.pop()
+			local b = B.pop()
+			n.push(a+b)
+		end
+		reg.push(math.floor(b/a))
+		return
+	end
+
 	if type(b)=='table' then
 		local b = b.clone()
 		b.replace_all(function(z) return math.floor(z/a) end)
@@ -265,6 +316,20 @@ def_funcs['^'] = function()
 	if type(b)=='boolean' then
 		b = b and 1 or 0
 	end
+
+	if (type(a)=="table" and type(b)=="table" and #a==#b)then
+		local n = stack.new()
+		local A = a.clone().invert()
+		local B = b.clone().invert()
+		while #A > 0 do
+			local a = A.pop()
+			local b = B.pop()
+			n.push(b^a)
+		end
+		reg.push(n)
+		return
+	end
+
 	if type(b)=='table' then
 		local b = b.clone()
 		b.replace_all(function(z) return z^a end)
@@ -363,6 +428,18 @@ def_funcs['%'] = function()
 	if type(b)=='boolean' then
 		b = b and 1 or 0
 	end
+	if (type(a)=="table" and type(b)=="table" and #a==#b)then
+		local n = stack.new()
+		local A = a.clone().invert()
+		local B = b.clone().invert()
+		while #A > 0 do
+			local a = A.pop()
+			local b = B.pop()
+			n.push(b%a)
+		end
+		reg.push(n)
+		return
+	end
 	if type(b)=='table' then
 		b.replace_all(function(z) return z % a end)
 		reg.push(b)
@@ -428,6 +505,7 @@ end
 def_funcs['sub'] = function() local a,b,c = reg.pop(),reg.pop(),reg.pop() reg.push(c:sub(b,a)) end
 def_funcs['index'] = function()
 	local b, a = reg.pop(),reg.pop()
+	b = ((b-1)%#a)+1
 	if type(a) == 'string' then
 		reg.push(a:sub(b,b))
 	elseif type(a) == 'stack' then
@@ -442,7 +520,7 @@ def_funcs['reg'] = function() reg.push(reg) end
 def_funcs['push'] = function() local a,b = reg.pop(),reg.pop() b.push(a)reg.push(b)end
 def_funcs['pop'] = function() local a = reg.peek()reg.push(a.pop())end
 def_funcs['peek'] = function() reg.push(reg.pop().peek()) end
-def_funcs['hasvalue'] = function() local a,b = reg.pop(),reg.pop() reg.push(b.hasValue(a)) end
+def_funcs['hasvalue'] = function() local a,b = reg.pop(),reg.pop() if type(b)=="table" then reg.push(b.hasValue(a)) else reg.push(a.hasValue(b)) end end
 def_funcs['delta'] = function()
 	local a = reg.pop()
 	if(type(a))=='string'then
@@ -455,7 +533,7 @@ def_funcs['delta'] = function()
 		local z = a.pop()							  -- Updated 25/11/16 2:39 AEST, size is still useless.
 		nt.push(z) -- Add the C value to the stack... -- Updated 06/12/16 3:55 AEST, Still useless. Maybe someday.
 		while a.len() > 0 do 						  -- Updated 20/12/16 5:22 AEST, how time flies. Still useless.
-			local Z = a.pop()
+			local Z = a.pop()						  -- Updated 16/02/17 2:43 AEST, new year, new me. This is still useless.
 			nt.push(Z - z) -- Does polarity of the delta REALLLLY matter to you people? Probably. POLARITY DOES MATTER AND THIS WAS WRONG!!
 			z = Z
 		end
@@ -586,6 +664,8 @@ def_funcs['or'] = function()
 		reg.push(reg.pop() or a)
 	end
 end
+
+-- Anything that still uses this makes me SAD
 def_funcs['-0'] = function(_,_,f)
 	local str = reg.pop()
 	str = str:gsub('.[\128-\191]*','%0 ')
@@ -697,8 +777,30 @@ def_funcs['decode64'] = function()
 	end
 	reg.push(s)
 end
-def_funcs['frombase'] = function()
-	local a,b = reg.pop(),reg.pop()
+
+
+-- base, number
+function int_to_base(a,b)
+	local s = ''
+	while b > 0 do
+		local n = math.floor(b % a)
+		if a == 64 then
+			n = b64:sub(n+1, n+1)
+		else
+			if n >= 10 then
+				n = string.char(55 + n)
+			else
+				n = math.floor(n)
+			end
+		end
+		s = n .. s
+		b = math.floor(b / a)
+	end
+	return s
+end
+
+-- base, number
+function base_to_int(a,b)
 	local n = 0
 	if(type(b)=='string')then
 		while #b > 0 do
@@ -721,33 +823,60 @@ def_funcs['frombase'] = function()
 			n = n * a + s
 		end
 	end
-	reg.push(math.floor(n))
+	return n
 end
+
+
+def_funcs['frombase'] = function()
+	local a,b = reg.pop(),reg.pop()
+	if(type(b)=='string')then
+		b = tonumber(b)
+	end
+	if(type(a)=='string')then
+		a = tonumber(a)
+	end
+	if(type(b)=='table')then
+		local c = b.clone()
+		if a > 0 then
+			c.replace_all(function(b)return base_to_int(a,b) end)
+		else
+			c.replace_all(function(b)return int_to_base(-a,b) end)
+		end
+		reg.push(c)
+	end
+	if(type(b)=='number')then
+		if a > 0 then
+			reg.push(base_to_int(a,b))
+		else
+			reg.push(int_to_base(-a,b))
+		end
+	end
+end
+
 def_funcs['base'] = function()
 	local a = reg.pop()
 	local b = reg.pop()
 	if(type(b)=='string')then
 		b = tonumber(b)
 	end
+	if(type(a)=='string')then
+		a = tonumber(a)
+	end
 	if(type(b)=='table')then
+		local c = b.clone()
+		if a > 0 then
+			c.replace_all(function(b)return int_to_base(a,b) end)
+		else
+			c.replace_all(function(b)return base_to_int(-a,b) end)
+		end
+		reg.push(c)
 	end
 	if(type(b)=='number')then
-		local s = ''
-		while b > 0 do
-			local n = math.floor(b % a)
-			if a == 64 then
-				n = b64:sub(n+1, n+1)
-			else
-				if n >= 10 then
-					n = string.char(55 + n)
-				else
-					n = math.floor(n)
-				end
-			end
-			s = n .. s
-			b = math.floor(b / a)
+		if a > 0 then
+			reg.push(int_to_base(a,b))
+		else
+			reg.push(base_to_int(-a,b))
 		end
-		reg.push(s)
 	end
 end
 def_funcs['sum'] = function(_,_,f)
@@ -1085,7 +1214,8 @@ def_funcs['debug'] = function(i,inp)
 	local a = true
 	for k,v in pairs(mem) do
 		a = a and print("CUSTOM MEMORY:")
-		print(k, '=', v)
+		v()
+		print(k, '=', reg.pop())
 	end
 
 end
@@ -1118,6 +1248,12 @@ flow.push(def_funcs['while'])
 flow.push(def_funcs['while_peek'])
 flow.push(def_funcs['function'])
 
+local funcNames = {}
+
+for k,v in pairs(def_funcs) do
+	funcNames[v] = k
+end
+
 local sugar = io.open('sugar.txt')
 for str in sugar:lines() do
 	local a,b = str:match("(%S+)%s+(%S+)")
@@ -1126,9 +1262,34 @@ for str in sugar:lines() do
 	end
 end
 
---[[ Debug Function, print all currently unused characters.
-for i=32, 127 do
-	if not def_funcs[string.char(i)] then
+local funcsWithShorts = {}
+
+for k,v in pairs(def_funcs) do
+	if #k <= 1 then
+		funcsWithShorts[v] = true
+	end
+end
+
+for k,v in pairs(funcNames) do
+	if not funcsWithShorts[k] then
+		print(v)
+	end
+end
+print("--------------")
+
+---[[ Debug Function, print all currently unused characters.
+local special = {}
+special['~'] = true
+special['`'] = true
+special['"'] = true
+special["'"] = true
+special['#'] = true
+special[' '] = true
+for i=0, 9 do
+	special[i..''] = true
+end
+for i=32, 126 do
+	if not def_funcs[string.char(i)] and not special[string.char(i)] then
 		io.write(string.char(i))
 	end
 end
@@ -1161,8 +1322,10 @@ function rpn(input, doEchoStack, upperLocal)
 			return function() reg.push(false) end
 		elseif key:match"^`" then
 			return function() reg.push(key:sub(2)) end
+		elseif key:match"^#" then
+			return function() reg.push(t[key:sub(2)]) end
 		elseif key:match'^~' then
-			rpn(key:sub(2):gsub(".-[\128-\191]*","%0 "):gsub("((['\"]).-%2)",function(s)return s:gsub('(.)%s','%1')end):gsub("` (.)","`%1"),false,funcs)
+			rpn(key:sub(2):gsub(".-[\128-\191]*","%0 "):gsub("((['\"]).-%2)",function(s)return s:gsub('(.)%s','%1')end):gsub("([`#]) (.)","%1%2"),false,funcs)
 		end
 	end})
 	local inString = false

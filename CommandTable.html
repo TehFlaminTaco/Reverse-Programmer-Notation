@@ -39,7 +39,7 @@
  <tr><td class="command"><</td><td>Compare the second topmost item of the reg stack with the top.</td></tr>
  <tr><td class="command"><=</td><td>Compare the second topmost item of the reg stack with the top.</td></tr>
  <tr><td class="command">== ("≡","E")</td><td>Compare the second topmost item of the reg stack with the top.</td></tr>
- <tr><td class="command">!=</td><td>Compare the second topmost item of the reg stack with the top.</td></tr>
+ <tr><td class="command">!= ("e")</td><td>Compare the second topmost item of the reg stack with the top.</td></tr>
  <tr><td class="command">></td><td>Compare the second topmost item of the reg stack with the top.</td></tr>
  <tr><td class="command">>=</td><td>Compare the second topmost item of the reg stack with the top.</td></tr>
  <tr><td class="command">and ("&amp;")</td><td>Compare the second topmost item of the reg stack with the top.</td></tr>
@@ -74,7 +74,7 @@
  <tr><td class="command">w</td><td>Write to the STDOUT.</td></tr>
  <tr><td class="command">read</td><td>Read a line from STDIN.</td></tr>
  <tr><td class="command">exit</td><td>Stop the script then and there, or exit the subprocess.</td></tr>
- <tr><td class="command">debug</td><td>Dumps a the contents of the stack to the STDOUT</td></tr>
+ <tr><td class="command">debug ("I")</td><td>Dumps a the contents of the stack to the STDOUT</td></tr>
  <tr><td class="command">do</td><td>Run the top of the stack as RProgN.</td></tr>
  <tr><td class="command">-0</td><td>Run the string as if it were a 0 space string.</td></tr>
  <tr><td class="command">Q</td><td>Push the current interpreted string. May behave unexpectedly outside the main function.</td></tr>
@@ -94,14 +94,14 @@
  <tr><td class="command">mem</td><td>Pushes the 'mem' stack to the stack. This is technically an associative array, containing all assigned global variables.</td></tr>
  <tr><td class="command">flow</td><td>Pushes the flow of control stack, used by 'end' for flow of control. Hard to use.</td></tr>
  <tr><td class="command">local ("⌂","@")</td><td>Returns a local asoc array. Values can be asoc'd to this, and they can then be called the same way as they would from the mem stack, but works sepereately for sub-functions.</td></tr>
- <tr><td class="command">T</td><td>Goat.</td></tr>
+ <tr><td class="command">goat</td><td>Goat.</td></tr>
  <tr><td class="command">&nbsp;</td><td>&nbsp;</td></tr>
  <tr><td class="header">*General Functions*</td><td>&nbsp;</td></tr>
  <tr><td class="command">frombase ("-B")</td><td>Convert the second topmost value from the base on top of the stack to an integer.</td></tr>
  <tr><td class="command">base ("﻿B")</td><td>Convert the second topmost value to the base on top of the stack.</td></tr>
  <tr><td class="command">char ("c")</td><td>Push the ascii character represented by the value on top of the stack, or if the top of the stack was a stack, a new stack containing all the values replaced with their ascii representation.</td></tr>
  <tr><td class="command">byte ("b")</td><td>Same functionality as 'char', but gets the byte that the ascii character represents. If the string is more than one character long, pushes a stack of numbers.</td></tr>
- <tr><td class="command">ceil ("^^", "¯")</td><td>Push the rounded up form of the top of the stack.</td></tr>
+ <tr><td class="command">ceil ("^^", "¯", "J")</td><td>Push the rounded up form of the top of the stack.</td></tr>
  <tr><td class="command">decode64</td><td>Decode a string as Base64.</td></tr>
  <tr><td class="command">encode64</td><td>Encode the top of the stack as base64.</td></tr>
  <tr><td class="command">delta ("d")</td><td>Push a stack of continuous differences of a stack or a string.</td></tr>
@@ -115,12 +115,13 @@
  <tr><td class="command">hasvalue</td><td>Truthy if the second topmost value contains the top value, falsey otherwise. Only works on stacks.</td></tr>
  <tr><td class="command">inverse</td><td>Push a new stack that is the top of the stack in reverse order.</td></tr>
  <tr><td class="command">invert ("i")</td><td>Same as inverse, yet modifies the target stack.</td></tr>
+ <tr><td class="command">clone ("u")</td><td>Make a new stack with identical contents.</td></tr>
  <tr><td class="command">len ("L")</td><td>Push the length of the top of the stack. Works for both stacks and strings.</td></tr>
  <tr><td class="command">lower ("l")</td><td>Convert the topmost value to lowercase.</td></tr>
- <tr><td class="command">max</td><td>If the top value is a stack, push its largest value, otherwise push the larger value of the top two items.</td></tr>
- <tr><td class="command">min</td><td>Same functionality as 'max', yet for the smallest value.</td></tr>
- <tr><td class="command">peek</td><td>Push the top of the stack of the stack under it, without popping said value. Stack underneith is still popped.</td></tr>
- <tr><td class="command">pop ("po", "☼")</td><td>Pop the top value of the stack on top of the stack.</td></tr>
+ <tr><td class="command">max ("N")</td><td>If the top value is a stack, push its largest value, otherwise push the larger value of the top two items.</td></tr>
+ <tr><td class="command">min ("n")</td><td>Same functionality as 'max', yet for the smallest value.</td></tr>
+ <tr><td class="command">peek ("K")</td><td>Push the top of the stack of the stack under it, without popping said value. Stack underneith is still popped.</td></tr>
+ <tr><td class="command">pop ("po", "☼", "O")</td><td>Pop the top value of the stack on top of the stack.</td></tr>
  <tr><td class="command">push ("P")</td><td>Push the top of the stack to the stack under it.</td></tr>
  <tr><td class="command">rand</td><td>Push a random number between the second most top value and the first.</td></tr>
  <tr><td class="command">randomseed</td><td>Seed the RNG with the top of the stack.</td></tr>
@@ -135,7 +136,7 @@
  <tr><td class="command">sub ("¢", "q")</td><td>Get the substring of the third top most value of the stack between the second and first indexes, 1 indexed.</td></tr>
  <tr><td class="command">index ("V")</td><td>Push the top of the stack'th value of the value under the top.</td></tr>
  <tr><td class="command">sum ("++", "‡")</td><td>Same functionality as '+'.</td></tr>
- <tr><td class="command">to ("▬")</td><td>Push a stack from the second topmost value to the first. Works for strings and numbbers.</td></tr>
+ <tr><td class="command">to ("▬", "T")</td><td>Push a stack from the second topmost value to the first. Works for strings and numbbers.</td></tr>
  <tr><td class="command">tostack ("S")</td><td>Convert the top of the stack to a stack of characters</td></tr>
  <tr><td class="command">type</td><td>Pushes a string name for the type of variable that is on top of the stack.</td></tr>
  <tr><td class="command">upper ("U")</td><td>Convert the top of the stack to uppercase.</td></tr>

@@ -35,7 +35,7 @@ P push			#
 º getraw		# Alt+167
 ¯ ceil			# Alt+0175
 ¡ else			# Alt+173
-× *				# Alt+0215
+× *			# Alt+0215
 g getraw		#
 ‡ sum			# Alt+0135
 ☼ pop			# Alt+15
@@ -68,3 +68,12 @@ j sqrt			#
 V index			#
 k factors		#
 v primacy		#
+T to			#
+N max			#
+n min			#
+K peek			#
+O pop			#
+J ceil			#
+u clone			#
+e !=			#
+I debug			#

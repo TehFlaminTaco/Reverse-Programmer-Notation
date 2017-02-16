@@ -13,7 +13,7 @@ function stack.new(size,t)
 	end
 	local holderT = t or {}
 	local st = {}
-	local meta = {}
+	local meta = {__len = function(a) return #holderT end}
 	function st.push(...)
 		local a = {...}
 		for k,val in pairs(a) do
